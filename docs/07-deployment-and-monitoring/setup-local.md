@@ -107,23 +107,41 @@ cd PSWE-07_Procesos_Administracion/app
 ```
 
 ### B.5 Ejecutar
-Terminal 1 — **webapp** (primera vez `npm install` tarda 5-15 min):
+
+Se usan **dos terminales de Ubuntu** que deben **quedar abiertas** mientras trabajas (si las cierras, se detienen la webapp y el server). Abre cada una desde el menú inicio → **"Ubuntu 24.04"** (terminal interactiva: así se cargan en el PATH `go`, `node` y `npm`; si usas otra consola podrían no encontrarse).
+
+**Paso 0 — Docker Desktop encendido.**
+Abre **Docker Desktop** y espera a que abajo a la izquierda diga **"Engine running"**. No arranca solo al encender la PC, así que hay que abrirlo cada vez. Verifícalo desde Ubuntu:
 ```bash
-cd ~/proyectos/PSWE-07_Procesos_Administracion/app/webapp
-nvm use
-npm install
-make run            # webpack en modo watch; recompila al guardar
+docker ps        # debe responder sin error (lista vacía la primera vez)
 ```
 
-Terminal 2 — **server** (levanta Docker + compila Go):
+**Paso 1 — Terminal 1: webapp.** La primera vez `npm install` tarda 5-15 min (descarga ~1.4 GB).
+```bash
+cd ~/proyectos/PSWE-07_Procesos_Administracion/app/webapp
+nvm use                 # usa Node 24.11 (lee .nvmrc)
+npm install             # solo la primera vez (o si cambió package.json)
+make run                # webpack en modo watch; recompila al guardar
+```
+⏳ **Espera a que termine el primer build** (verás `webpack ... compiled successfully`). **Deja esta terminal abierta.**
+
+**Paso 2 — Terminal 2: server** (levanta PostgreSQL/Inbucket en Docker y compila Go):
 ```bash
 cd ~/proyectos/PSWE-07_Procesos_Administracion/app/server
 ENABLED_DOCKER_SERVICES="postgres inbucket" make run-server
 ```
-`ENABLED_DOCKER_SERVICES` limita los contenedores a PostgreSQL y el servidor de correo de prueba (sin él también levanta MinIO/Azurite y consume más RAM).
+`ENABLED_DOCKER_SERVICES` limita los contenedores a PostgreSQL y al servidor de correo de prueba (sin él también levanta MinIO/Azurite y consume más RAM).
 
-Abrir http://localhost:8065 → crear primera cuenta (System Admin) → crear equipo.
-Correos de prueba (invitaciones, notificaciones): http://localhost:9001 (Inbucket).
+> ℹ️ `make run-server` arranca el servidor **en segundo plano y el comando "termina"** (vuelve el prompt) — es normal, **no cierres la terminal**: si la cierras, el servidor se detiene. La primera compilación de Go tarda 1-3 min; está listo cuando en el log aparece `Server is listening on [::]:8065`.
+
+**Paso 3 — Verificar.** En el navegador de Windows abre **http://localhost:8065** (WSL reenvía `localhost` automáticamente). O desde Ubuntu:
+```bash
+curl http://localhost:8065/api/v4/system/ping     # debe devolver {"status":"OK"}
+```
+Luego: crear la primera cuenta (queda como **System Admin**) → crear un equipo.
+Correos de prueba (invitaciones, notificaciones): **http://localhost:9001** (Inbucket).
+
+> Si la página sale en blanco unos segundos, webpack aún está terminando de compilar chunks: recarga en un momento.
 
 ### B.6 Detener
 ```bash
@@ -153,6 +171,10 @@ cd app/server && go test ./channels/app/... -run <NombreTest>
 | WSL sin internet con VPN | NAT de WSL2 + VPN corporativa | `networkingMode=mirrored` en `.wslconfig` |
 | Página en blanco en :8065 | Webapp aún compilando | Esperar a que `make run` termine el primer build |
 | `npm install` muy lento | Repo en `/mnt/c` | Clonar en `~/proyectos` (filesystem Linux) |
+| `start-docker` falla: `Cannot connect to the Docker daemon` | Docker Desktop apagado | Abrir Docker Desktop y esperar "Engine running" (Paso 0) |
+| `start-docker` falla: `lookup registry-1.docker.io: no such host` | DNS del engine aún no listo tras abrir Docker Desktop | Esperar unos segundos y reintentar `make run-server`; o pre-descargar: `docker pull postgres:14 && docker pull inbucket/inbucket:3.1.1` |
+| El server se detiene solo | Se cerró la Terminal 2 | `make run-server` corre en esa terminal; mantenerla abierta |
+| `command not found: go` / `node` | Terminal no interactiva | Abrir la terminal desde "Ubuntu 24.04" (menú inicio) |
 
 ---
 
