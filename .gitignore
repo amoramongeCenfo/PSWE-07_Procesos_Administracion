@@ -1,0 +1,9 @@
+# SO / editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Dependencias y artefactos (las reglas de Mattermost viven en app/.gitignore)
+node_modules/
