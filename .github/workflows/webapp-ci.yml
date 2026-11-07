@@ -39,7 +39,7 @@ jobs:
     outputs:
       webapp: ${{ steps.diff.outputs.webapp }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - uses: ./.github/actions/webapp-setup
@@ -83,7 +83,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - uses: ./.github/actions/webapp-setup
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - uses: ./.github/actions/webapp-setup
@@ -121,7 +121,7 @@ jobs:
       LC_ALL: en_US.UTF-8
       LANG: en_US.UTF-8
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -158,7 +158,7 @@ jobs:
 
       - name: guardar reporte de cobertura (evidencia de métrica)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-feature-17740-${{ github.run_number }}
           path: app/webapp/channels/coverage/feature-17740
@@ -171,7 +171,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - uses: ./.github/actions/webapp-setup
@@ -181,7 +181,7 @@ jobs:
 
   jest-full:
     # Suite completa de channels: solo semanal o manual (≈ 4 x 20 min). No bloquea PRs.
-    name: jest-full (shard ${{ matrix.shard }}/4)
+    name: jest-full
     needs: setup
     if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.full-tests)
     runs-on: ubuntu-24.04
@@ -191,7 +191,7 @@ jobs:
       matrix:
         shard: [1, 2, 3, 4]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - uses: ./.github/actions/webapp-setup
