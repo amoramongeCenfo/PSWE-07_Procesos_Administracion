@@ -101,6 +101,8 @@ export const Preferences = {
     COLLAPSED_REPLY_THREADS_ON: 'on',
     CLICK_TO_REPLY: 'click_to_reply',
     CLICK_TO_REPLY_DEFAULT: 'true',
+    ALLOW_ANIMATED_IMAGES: 'allow_animated_images',
+    ALLOW_ANIMATED_IMAGES_DEFAULT: 'true',
     COLLAPSED_REPLY_THREADS_FALLBACK_DEFAULT: 'off',
     RENDER_EMOTICONS_AS_EMOJI: 'render_emoticons_as_emoji',
     RENDER_EMOTICONS_AS_EMOJI_DEFAULT: 'true',

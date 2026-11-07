@@ -117,6 +117,7 @@ describe('components/user_settings/display/UserSettingsDisplay', () => {
         renderEmoticonsAsEmoji: '',
         emojiPickerEnabled: true,
         clickToReply: '',
+        allowAnimatedImages: 'true',
         lastActiveTimeEnabled: true,
     };
 
@@ -211,6 +212,41 @@ describe('components/user_settings/display/UserSettingsDisplay', () => {
         const props = {...requiredProps, activeSection: 'click_to_reply'};
         const {container} = renderWithContext(<UserSettingsDisplay {...props}/>);
         expect(container).toMatchSnapshot();
+    });
+
+    test('should show the animated images section with the current value', () => {
+        const props = {...requiredProps, activeSection: 'allow_animated_images'};
+        renderWithContext(<UserSettingsDisplay {...props}/>);
+
+        expect(screen.getAllByText('Animated images and emoji').length).toBeGreaterThan(0);
+        expect(screen.getByRole('radio', {name: 'On'})).toBeChecked();
+        expect(screen.getByRole('radio', {name: 'Off'})).not.toBeChecked();
+    });
+
+    test('should save allow_animated_images as false when turned off', async () => {
+        const savePreferences = jest.fn();
+        const updateSection = jest.fn();
+        const props = {
+            ...requiredProps,
+            updateSection,
+            activeSection: 'allow_animated_images',
+            actions: {...requiredProps.actions, savePreferences},
+        };
+        renderWithContext(<UserSettingsDisplay {...props}/>);
+
+        await userEvent.click(screen.getByRole('radio', {name: 'Off'}));
+        await userEvent.click(screen.getByTestId('saveSetting'));
+
+        expect(savePreferences).toHaveBeenCalledWith(
+            requiredProps.user.id,
+            expect.arrayContaining([
+                expect.objectContaining({
+                    category: 'display_settings',
+                    name: 'allow_animated_images',
+                    value: 'false',
+                }),
+            ]),
+        );
     });
 
     test('should have called handleSubmit', async () => {
