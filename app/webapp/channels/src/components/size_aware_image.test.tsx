@@ -5,7 +5,7 @@ import React from 'react';
 
 import SizeAwareImage from 'components/size_aware_image';
 
-import {renderWithContext, act, screen} from 'tests/react_testing_utils';
+import {renderWithContext, act, screen, userEvent} from 'tests/react_testing_utils';
 import {TestHelper} from 'utils/test_helper';
 
 function simulateImageLoad(img: HTMLImageElement, naturalWidth: number, naturalHeight: number) {
@@ -298,5 +298,97 @@ describe('components/SizeAwareImage', () => {
 
         const {container} = renderWithContext(<SizeAwareImage {...props}/>, state);
         expect(container.querySelector('button.size-aware-image__copy_link')).toBeNull();
+    });
+
+    describe('animated images setting', () => {
+        const gifProps = {
+            ...baseProps,
+            src: 'https://example.com/funny.gif?size=large',
+            fileInfo: undefined,
+        };
+
+        const preferencesState = (value: string) => ({
+            ...state,
+            entities: {
+                ...state.entities,
+                preferences: {
+                    myPreferences: {
+                        'display_settings--allow_animated_images': {
+                            user_id: 'currentUserId',
+                            category: 'display_settings',
+                            name: 'allow_animated_images',
+                            value,
+                        },
+                    },
+                },
+            },
+        });
+
+        beforeEach(() => {
+            jest.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({drawImage: jest.fn()} as unknown as CanvasRenderingContext2D);
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        test('should keep animating a GIF when the setting is on', async () => {
+            const {container} = renderWithContext(<SizeAwareImage {...gifProps}/>, preferencesState('true'));
+
+            await simulateImageLoad(screen.getByRole('img', {hidden: true}) as HTMLImageElement, 300, 200);
+
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(container.querySelector('.size-aware-image__animation-toggle')).toBeNull();
+        });
+
+        test('should show a still frame and a play button for a GIF when the setting is off', async () => {
+            const {container} = renderWithContext(<SizeAwareImage {...gifProps}/>, preferencesState('false'));
+
+            await simulateImageLoad(container.querySelector('img[aria-label]') as HTMLImageElement, 300, 200);
+
+            expect(container.querySelector('canvas')).not.toBeNull();
+            expect(container.querySelector<HTMLImageElement>('img[aria-label]')?.style.display).toBe('none');
+            expect(screen.getByRole('button', {name: 'Play animation'})).toBeInTheDocument();
+        });
+
+        test('should not make a non-animated image static when the setting is off', async () => {
+            const {container} = renderWithContext(
+                <SizeAwareImage {...{...baseProps, src: 'https://example.com/image.png', fileInfo: undefined}}/>,
+                preferencesState('false'),
+            );
+
+            await simulateImageLoad(container.querySelector('img[aria-label]') as HTMLImageElement, 300, 200);
+
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(container.querySelector('.size-aware-image__animation-toggle')).toBeNull();
+        });
+
+        test('clicking a still GIF plays it without opening the preview, and pause returns to the still frame', async () => {
+            const onClick = jest.fn();
+            const {container} = renderWithContext(<SizeAwareImage {...{...gifProps, onClick}}/>, preferencesState('false'));
+
+            await simulateImageLoad(container.querySelector('img[aria-label]') as HTMLImageElement, 300, 200);
+
+            await userEvent.click(container.querySelector('canvas') as HTMLCanvasElement);
+
+            expect(onClick).not.toHaveBeenCalled();
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(container.querySelector<HTMLImageElement>('img[aria-label]')?.style.display).not.toBe('none');
+
+            await userEvent.click(screen.getByRole('button', {name: 'Pause animation'}));
+
+            expect(container.querySelector('canvas')).not.toBeNull();
+        });
+
+        test('clicking the image while it plays opens the preview as usual', async () => {
+            const onClick = jest.fn();
+            const {container} = renderWithContext(<SizeAwareImage {...{...gifProps, onClick}}/>, preferencesState('false'));
+
+            await simulateImageLoad(container.querySelector('img[aria-label]') as HTMLImageElement, 300, 200);
+            await userEvent.click(screen.getByRole('button', {name: 'Play animation'}));
+            await userEvent.click(container.querySelector('img[aria-label]') as HTMLImageElement);
+
+            expect(onClick).toHaveBeenCalledTimes(1);
+        });
     });
 });

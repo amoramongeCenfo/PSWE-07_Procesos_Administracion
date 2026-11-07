@@ -8,19 +8,23 @@ import React from 'react';
 import type {CSSProperties, KeyboardEvent, MouseEvent, SyntheticEvent} from 'react';
 import {FormattedMessage, injectIntl} from 'react-intl';
 import type {WrappedComponentProps} from 'react-intl';
+import {connect} from 'react-redux';
 
-import {DownloadOutlineIcon, LinkVariantIcon, CheckIcon} from '@mattermost/compass-icons/components';
+import {DownloadOutlineIcon, LinkVariantIcon, CheckIcon, PlayIcon} from '@mattermost/compass-icons/components';
 import {WithTooltip} from '@mattermost/shared/components/tooltip';
 import type {FileInfo} from '@mattermost/types/files';
 import type {PostImage} from '@mattermost/types/posts';
 
+import {getBool} from 'mattermost-redux/selectors/entities/preferences';
 import type {ActionResult} from 'mattermost-redux/types/actions';
 import {getFileMiniPreviewUrl} from 'mattermost-redux/utils/file_utils';
 
 import LoadingImagePreview from 'components/loading_image_preview';
 
-import {FileTypes} from 'utils/constants';
-import {copyToClipboard, getFileType} from 'utils/utils';
+import {FileTypes, Preferences} from 'utils/constants';
+import {copyToClipboard, getFileType, isGIFImage} from 'utils/utils';
+
+import type {GlobalState} from 'types/store';
 
 const MIN_IMAGE_SIZE = 48;
 const MIN_IMAGE_SIZE_FOR_INTERNAL_BUTTONS = 100;
@@ -104,6 +108,12 @@ export type Props = WrappedComponentProps & {
     * Indicates whether the file has been rejected and should not show preview
     */
     isFileRejected?: boolean;
+
+    /*
+    * When false, animated images (GIFs) show a still first frame until the user plays them.
+    * Comes from the "Animated images and emoji" display setting.
+    */
+    allowAnimatedImages?: boolean;
 };
 
 type State = {
@@ -113,6 +123,7 @@ type State = {
     linkCopyInProgress: boolean;
     error: boolean;
     imageWidth: number;
+    playing: boolean;
 };
 
 // SizeAwareImage is a component used for rendering images where the dimensions of the image are important for
@@ -134,18 +145,75 @@ export class SizeAwareImage extends React.PureComponent<Props, State> {
             linkCopyInProgress: false,
             error: false,
             imageWidth: dimensions?.width ?? 0,
+            playing: false,
         };
 
         this.heightTimeout = 0;
     }
 
+    private imageRef = React.createRef<HTMLImageElement>();
+    private canvasRef = React.createRef<HTMLCanvasElement>();
+
     componentDidMount() {
         this.mounted = true;
+    }
+
+    componentDidUpdate(prevProps: Props, prevState: State) {
+        // Draw the still frame when the canvas has just appeared or the image changed
+        if (this.isShowingStill() && (!this.wasShowingStill(prevProps, prevState) || prevProps.src !== this.props.src)) {
+            this.drawStillFrame();
+        }
+
+        // A manual "play" only lasts while the setting is off and for the same image
+        if (this.state.playing && (this.props.allowAnimatedImages !== false || prevProps.src !== this.props.src)) {
+            this.setState({playing: false});
+        }
     }
 
     componentWillUnmount() {
         this.mounted = false;
     }
+
+    isAnimatedImage = () => {
+        if (isGIFImage(this.props.fileInfo?.extension ?? '')) {
+            return true;
+        }
+
+        try {
+            return new URL(this.props.src, 'http://localhost').pathname.toLowerCase().endsWith('.gif');
+        } catch {
+            return false;
+        }
+    };
+
+    // True when the user turned animations off and this image is an animated one
+    isStillMode = (props: Props = this.props) => props.allowAnimatedImages === false && this.isAnimatedImage();
+
+    isShowingStill = () => this.isStillMode() && !this.state.playing && this.state.loaded;
+
+    wasShowingStill = (prevProps: Props, prevState: State) => this.isStillMode(prevProps) && !prevState.playing && prevState.loaded;
+
+    drawStillFrame = () => {
+        const image = this.imageRef.current;
+        const canvas = this.canvasRef.current;
+        if (!image || !canvas || !image.naturalWidth) {
+            return;
+        }
+
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        canvas.getContext('2d')?.drawImage(image, 0, 0);
+    };
+
+    playAnimation = (e?: MouseEvent | KeyboardEvent) => {
+        e?.stopPropagation();
+        this.setState({playing: true});
+    };
+
+    pauseAnimation = (e?: MouseEvent | KeyboardEvent) => {
+        e?.stopPropagation();
+        this.setState({playing: false});
+    };
 
     dimensionsAvailable = (dimensions?: Partial<PostImage>) => {
         return dimensions && dimensions.width && dimensions.height;
@@ -181,19 +249,29 @@ export class SizeAwareImage extends React.PureComponent<Props, State> {
         }
     };
 
-    handleImageClick = (e: MouseEvent<HTMLImageElement>) => {
+    handleImageClick = (e: MouseEvent<HTMLImageElement | HTMLCanvasElement>) => {
         if (!this.state.loaded) {
             return;
         }
 
+        if (this.isShowingStill()) {
+            this.playAnimation(e);
+            return;
+        }
+
         e.stopPropagation();
-        this.props.onClick?.(e, this.props.src);
+        this.props.onClick?.(e as MouseEvent<HTMLImageElement>, this.props.src);
     };
 
-    onEnterKeyDown = (e: KeyboardEvent<HTMLImageElement>) => {
+    onEnterKeyDown = (e: KeyboardEvent<HTMLImageElement | HTMLCanvasElement>) => {
         if (e.key === 'Enter') {
+            if (this.isShowingStill()) {
+                this.playAnimation(e);
+                return;
+            }
+
             e.stopPropagation();
-            this.props.onClick?.(e, this.props.src);
+            this.props.onClick?.(e as KeyboardEvent<HTMLImageElement>, this.props.src);
         }
     };
 
@@ -223,6 +301,7 @@ export class SizeAwareImage extends React.PureComponent<Props, State> {
             renderPlaceholderOnly,
             ...props
         } = this.props;
+        Reflect.deleteProperty(props, 'allowAnimatedImages');
         Reflect.deleteProperty(props, 'showLoader');
         Reflect.deleteProperty(props, 'onImageLoaded');
         Reflect.deleteProperty(props, 'onImageLoadFail');
@@ -256,23 +335,72 @@ export class SizeAwareImage extends React.PureComponent<Props, State> {
             mergedImgStyle = {...conditionalSVGStyleAttribute, ...this.props.style};
         }
 
+        const imageClassName = this.props.className +
+            (this.props.handleSmallImageContainer && this.state.isSmallImage ? ' small-image--inside-container' : '');
+
+        // While showing the still frame the <img> stays mounted (hidden) only to load the GIF;
+        // the <canvas> holding its first frame is what the user sees.
+        const showingStill = this.isShowingStill();
+
         const image = (
-            <img
-                {...props}
-                aria-label={ariaLabelImage}
-                tabIndex={0}
-                onClick={this.handleImageClick}
-                onKeyDown={this.onEnterKeyDown}
-                className={
-                    this.props.className +
-                    (this.props.handleSmallImageContainer &&
-                        this.state.isSmallImage ? ' small-image--inside-container' : '')}
-                src={src}
-                onError={this.handleError}
-                onLoad={this.handleLoad}
-                style={mergedImgStyle}
-            />
+            <>
+                <img
+                    {...props}
+                    ref={this.imageRef}
+                    aria-label={ariaLabelImage}
+                    tabIndex={showingStill ? -1 : 0}
+                    onClick={this.handleImageClick}
+                    onKeyDown={this.onEnterKeyDown}
+                    className={imageClassName}
+                    src={src}
+                    onError={this.handleError}
+                    onLoad={this.handleLoad}
+                    style={showingStill ? {...mergedImgStyle, display: 'none'} : mergedImgStyle}
+                />
+                {showingStill && (
+                    <canvas
+                        ref={this.canvasRef}
+                        role='img'
+                        aria-label={intl.formatMessage({id: 'size_aware_image.still_image', defaultMessage: 'Animation paused, select to play: {name}'}, {name: ariaLabelImage})}
+                        tabIndex={0}
+                        onClick={this.handleImageClick}
+                        onKeyDown={this.onEnterKeyDown}
+                        className={imageClassName}
+                        style={mergedImgStyle}
+                    />
+                )}
+            </>
         );
+
+        let animationToggle;
+        if (this.isStillMode() && this.state.loaded) {
+            const toggleLabel = showingStill ? intl.formatMessage({id: 'size_aware_image.play_animation', defaultMessage: 'Play animation'}) : intl.formatMessage({id: 'size_aware_image.pause_animation', defaultMessage: 'Pause animation'});
+            animationToggle = (
+                <WithTooltip title={toggleLabel}>
+                    <button
+                        className='style--none size-aware-image__animation-toggle'
+                        aria-label={toggleLabel}
+                        onClick={showingStill ? this.playAnimation : this.pauseAnimation}
+                    >
+                        {showingStill ? (
+                            <PlayIcon
+                                className={'style--none'}
+                                size={18}
+                            />
+                        ) : (
+                            <svg
+                                width='18'
+                                height='18'
+                                viewBox='0 0 24 24'
+                                aria-hidden='true'
+                            >
+                                <path d='M6 5h4v14H6zM14 5h4v14h-4z'/>
+                            </svg>
+                        )}
+                    </button>
+                </WithTooltip>
+            );
+        }
 
         // copyLink, download are two buttons overlayed on image preview
         // copyLinkTooltip, downloadTooltip are tooltips for the buttons respectively.
@@ -395,6 +523,7 @@ export class SizeAwareImage extends React.PureComponent<Props, State> {
         return this.renderImageContainer(
             <>
                 {image}
+                {animationToggle}
                 {utilityButtons}
             </>,
             shouldShowImg ? 'block' : 'none',
@@ -528,4 +657,16 @@ function emptyImageForDimensions(width: number, height: number): string {
     return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
-export default injectIntl(SizeAwareImage);
+function mapStateToProps(state: GlobalState) {
+    // Consumers rendered without a full store (isolated previews, some tests) keep animating.
+    if (!state.entities?.preferences) {
+        return {allowAnimatedImages: true};
+    }
+
+    return {
+        allowAnimatedImages: getBool(state, Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.ALLOW_ANIMATED_IMAGES, true),
+    };
+}
+
+// The empty dispatch map keeps connect from injecting a `dispatch` prop, which would be spread onto the <img>.
+export default connect(mapStateToProps, {})(injectIntl(SizeAwareImage));
