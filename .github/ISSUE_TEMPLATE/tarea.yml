@@ -1,0 +1,32 @@
+name: "Tarea de proceso / documentación"
+description: "Trabajo no funcional: documentación, CI, métricas, riesgos, costos, entregables."
+title: "[tarea] "
+labels: ["documentation"]
+body:
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Descripción
+      description: "Qué se debe producir y para qué sección del entregable."
+    validations:
+      required: true
+  - type: textarea
+    id: definicion-hecho
+    attributes:
+      label: Definición de hecho
+      value: |
+        - [ ] Artefacto en el repo (ruta: )
+        - [ ] Integrado en el PDF del entregable
+        - [ ] Uso de IA registrado en el anexo (si aplica)
+    validations:
+      required: true
+  - type: dropdown
+    id: entregable
+    attributes:
+      label: Entregable
+      options:
+        - "Avance 2"
+        - "Entrega final"
+        - "Defensa"
+    validations:
+      required: true
