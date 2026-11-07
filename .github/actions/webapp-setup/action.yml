@@ -1,0 +1,37 @@
+name: "Webapp setup"
+description: "Instala Node (versión de app/.nvmrc) y dependencias del webapp de Mattermost con caché de node_modules."
+
+runs:
+  using: "composite"
+  steps:
+    - name: setup-node
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: "app/.nvmrc"
+
+    - name: cache-node-modules
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          app/webapp/node_modules
+          app/webapp/channels/node_modules
+          app/webapp/platform/client/node_modules
+          app/webapp/platform/components/node_modules
+          app/webapp/platform/shared/node_modules
+          app/webapp/platform/types/node_modules
+        key: webapp-node-modules-${{ runner.os }}-${{ hashFiles('app/webapp/package-lock.json') }}
+
+    - name: npm-ci
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      working-directory: app/webapp
+      # postinstall compila los paquetes platform/* (types, client, shared, components)
+      run: npm ci --include=dev --no-audit --no-fund
+
+    - name: build-platform-packages
+      # Los paquetes platform/* compilados no se guardan en caché; se recompilan si hubo cache hit.
+      if: steps.cache.outputs.cache-hit == 'true'
+      shell: bash
+      working-directory: app/webapp
+      run: npm run postinstall

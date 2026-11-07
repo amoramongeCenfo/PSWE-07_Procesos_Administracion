@@ -1,5 +1,7 @@
 # PSWE-07 Procesos y Administración de Software — Proyecto final
 
+[![Webapp CI](https://github.com/amoramongeCenfo/PSWE-07_Procesos_Administracion/actions/workflows/webapp-ci.yml/badge.svg)](https://github.com/amoramongeCenfo/PSWE-07_Procesos_Administracion/actions/workflows/webapp-ci.yml)
+
 Proyecto final del curso **C3-PSWE Procesos de Ingeniería de Software** (Universidad CENFOTEC).
 
 **Mejora propuesta:** opción de cuenta para desactivar la animación de GIFs y emoji en Mattermost (accesibilidad, WCAG 2.2.2).
