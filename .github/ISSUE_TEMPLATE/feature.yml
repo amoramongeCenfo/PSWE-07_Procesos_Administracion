@@ -1,0 +1,51 @@
+name: "Funcionalidad / mejora"
+description: "Trabajo de desarrollo sobre la mejora (#17740: control de animaciones de GIFs y emojis)."
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Antes de abrir: revisar que no exista ya un issue igual en el tablero
+        (https://github.com/users/amoramongeCenfo/projects/2).
+        Rama asociada: `feature/<n°-issue>-<slug>` (ver `docs/04-development-process/flujo-desarrollo.md`).
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: "¿Qué valor aporta? Como <usuario>, quiero <acción>, para <beneficio>."
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Criterios de aceptación
+      description: "Lista verificable. Cada criterio debe poder cubrirse con una prueba (Jest o e2e)."
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: componentes
+    attributes:
+      label: Componentes / archivos afectados (estimado)
+      description: "Rutas bajo app/webapp/channels/src/... Ayuda a anticipar conflictos entre integrantes."
+  - type: textarea
+    id: pruebas
+    attributes:
+      label: Pruebas previstas
+      description: "Qué pruebas unitarias (Jest + RTL) y/o e2e se escribirán."
+      value: |
+        - Unitarias:
+        - e2e (si aplica):
+  - type: dropdown
+    id: entregable
+    attributes:
+      label: Entregable
+      options:
+        - "Avance 2"
+        - "Entrega final"
+        - "Defensa"
+    validations:
+      required: true

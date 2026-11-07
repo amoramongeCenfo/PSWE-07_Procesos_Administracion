@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Tablero del proyecto (planificación)
+    url: https://github.com/users/amoramongeCenfo/projects/2
+    about: Revisar el plan y responsables antes de abrir un issue nuevo.
+  - name: Issue original en Mattermost (#17740)
+    url: https://github.com/mattermost/mattermost/issues/17740
+    about: Fuente de verdad del comportamiento esperado de la mejora.

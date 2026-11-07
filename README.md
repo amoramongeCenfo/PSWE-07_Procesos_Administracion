@@ -15,9 +15,10 @@ Licencias originales en `app/LICENSE.txt` y `app/LICENSE.enterprise`.
 ## Estructura
 ```
 .
+├── .github/  # Plantillas de issues y PR (CI en #14)
 ├── app/      # Código fuente de Mattermost (server Go + webapp TypeScript/React)
 ├── docs/     # Documentación del proyecto (por entregable)
-└── tests/    # Pruebas de la mejora
+└── tests/    # Configuración de la suite de pruebas de la mejora
 ```
 
 ## Documentación
@@ -25,6 +26,9 @@ Licencias originales en `app/LICENSE.txt` y `app/LICENSE.enterprise`.
 |---|---|
 | [C4 Nivel 1 — Contexto](docs/03-technical-spec/c4-contexto.md) | E1-h |
 | [Setup local (demo y desarrollo)](docs/07-deployment-and-monitoring/setup-local.md) | E1-e/f |
+| [Flujo de desarrollo: issues, ramas, PR](docs/04-development-process/flujo-desarrollo.md) | E2-a |
+| [Estrategia de pruebas](docs/06-testing/estrategia-tests.md) | E2-a |
+| [CI con GitHub Actions](docs/07-deployment-and-monitoring/ci-github-actions.md) | E2-a |
 
 ## Equipo
 | Integrante |
