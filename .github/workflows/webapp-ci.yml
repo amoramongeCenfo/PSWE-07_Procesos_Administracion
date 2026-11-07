@@ -1,0 +1,200 @@
+# CI del webapp (React/TypeScript) para la mejora #17740.
+# Documentación: docs/07-deployment-and-monitoring/ci-github-actions.md
+#
+# Jobs requeridos por la protección de main: lint, types, jest, build.
+# Si un PR no toca app/webapp (p. ej. solo docs), esos jobs quedan "skipped",
+# lo que GitHub cuenta como éxito, y el PR no queda bloqueado.
+
+name: Webapp CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      full-tests:
+        description: "Ejecutar la suite Jest completa de channels (lento, ~4 shards)"
+        type: boolean
+        default: false
+  schedule:
+    # Suite completa semanal: lunes 06:00 UTC (00:00 Costa Rica)
+    - cron: "0 6 * * 1"
+
+concurrency:
+  group: webapp-ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  NODE_OPTIONS: --max_old_space_size=6144
+
+jobs:
+  changes:
+    name: changes
+    runs-on: ubuntu-24.04
+    outputs:
+      webapp: ${{ steps.diff.outputs.webapp }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: diff
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ] && [ "${{ github.event_name }}" != "push" ]; then
+            echo "webapp=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE="${{ github.event.before }}"
+          fi
+          # push inicial de una rama nueva: before = 000...; comparar contra el padre
+          if ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then BASE="HEAD~1"; fi
+          CHANGED=$(git diff --name-only "$BASE" HEAD)
+          echo "Archivos cambiados:"; echo "$CHANGED"
+          if echo "$CHANGED" | grep -qE '^(app/webapp/|app/\.nvmrc|tests/|\.github/workflows/webapp-ci\.yml|\.github/actions/webapp-setup/)'; then
+            echo "webapp=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "webapp=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  setup:
+    # Calienta la caché de node_modules una sola vez; los demás jobs la restauran.
+    name: setup
+    needs: changes
+    if: needs.changes.outputs.webapp == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/webapp-setup
+
+  lint:
+    name: lint
+    needs: setup
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/webapp-setup
+      - name: eslint + stylelint
+        working-directory: app/webapp
+        run: npm run check
+      - name: i18n (textos nuevos extraídos a en.json)
+        working-directory: app/webapp/channels
+        run: npm run i18n-extract:check
+
+  types:
+    name: types
+    needs: setup
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/webapp-setup
+      - name: tsc
+        working-directory: app/webapp
+        run: npm run check-types
+
+  jest:
+    name: jest
+    needs: setup
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: app/webapp/channels
+    env:
+      TZ: Etc/UTC
+      LC_ALL: en_US.UTF-8
+      LANG: en_US.UTF-8
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ./.github/actions/webapp-setup
+
+      - name: suite de la mejora (#17740) con cobertura
+        run: |
+          npx jest --ci --config ../../../tests/jest.config.feature.js \
+            --coverage --forceExit --maxWorkers=100%
+
+      - name: pruebas relacionadas con los archivos cambiados en el PR
+        if: github.event_name == 'pull_request'
+        run: |
+          npx jest --ci --forceExit --maxWorkers=100% --passWithNoTests \
+            --changedSince="${{ github.event.pull_request.base.sha }}"
+
+      - name: resumen de cobertura
+        if: always()
+        run: |
+          node -e '
+            const fs = require("fs");
+            const f = "coverage/feature-17740/coverage-summary.json";
+            if (!fs.existsSync(f)) { console.log("sin reporte de cobertura"); process.exit(0); }
+            const t = JSON.parse(fs.readFileSync(f)).total;
+            const row = (k) => `| ${k} | ${t[k].covered}/${t[k].total} | ${t[k].pct}% |`;
+            const md = [
+              "### Cobertura — módulos de la mejora #17740",
+              "| Métrica | Cubiertas | % |", "|---|---|---|",
+              row("statements"), row("branches"), row("functions"), row("lines"),
+            ].join("\n");
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md + "\n");
+            console.log(md);
+          '
+
+      - name: guardar reporte de cobertura (evidencia de métrica)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-feature-17740-${{ github.run_number }}
+          path: app/webapp/channels/coverage/feature-17740
+          retention-days: 90
+          if-no-files-found: ignore
+
+  build:
+    name: build
+    needs: setup
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/webapp-setup
+      - name: webpack (producción)
+        working-directory: app/webapp
+        run: npm run build
+
+  jest-full:
+    # Suite completa de channels: solo semanal o manual (≈ 4 x 20 min). No bloquea PRs.
+    name: jest-full
+    needs: setup
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.full-tests)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/webapp-setup
+      - name: jest (channels)
+        working-directory: app/webapp/channels
+        run: npm run test-ci -- --config jest.config.channels.js --shard=${{ matrix.shard }}/4
