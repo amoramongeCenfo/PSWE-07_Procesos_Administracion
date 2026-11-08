@@ -401,7 +401,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"
@@ -1092,7 +1092,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"
@@ -1730,7 +1730,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"
@@ -2368,7 +2368,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"
@@ -2953,7 +2953,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"
@@ -3470,7 +3470,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"
@@ -4108,7 +4108,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"
@@ -4758,7 +4758,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"
@@ -5343,7 +5343,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"
@@ -5928,7 +5928,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"
@@ -6513,7 +6513,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"
@@ -7106,7 +7106,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"
@@ -7691,7 +7691,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"
@@ -8237,7 +8237,7 @@ exports[`components/user_settings/display/UserSettingsDisplay should not show la
               class="section-min__title"
               id="allow_animated_imagesTitle"
             >
-              Animated images and emoji
+              Animated images (GIFs)
             </h4>
             <button
               aria-expanded="false"

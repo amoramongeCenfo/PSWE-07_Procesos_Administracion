@@ -1035,7 +1035,7 @@ export default class UserSettingsDisplay extends React.PureComponent<Props, Stat
             defaultDisplay: Preferences.ALLOW_ANIMATED_IMAGES_DEFAULT,
             title: defineMessage({
                 id: 'user.settings.display.allowAnimatedImages',
-                defaultMessage: 'Animated images and emoji',
+                defaultMessage: 'Animated images (GIFs)',
             }),
             firstOption: {
                 value: 'true',
@@ -1057,7 +1057,7 @@ export default class UserSettingsDisplay extends React.PureComponent<Props, Stat
             },
             description: defineMessage({
                 id: 'user.settings.display.allowAnimatedImagesDescription',
-                defaultMessage: 'When off, GIFs and animated emoji are shown as a still image until you select them.',
+                defaultMessage: 'When off, GIFs are shown as a still image until you select them.',
             }),
         });
 

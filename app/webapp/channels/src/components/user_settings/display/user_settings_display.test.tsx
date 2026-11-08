@@ -218,7 +218,7 @@ describe('components/user_settings/display/UserSettingsDisplay', () => {
         const props = {...requiredProps, activeSection: 'allow_animated_images'};
         renderWithContext(<UserSettingsDisplay {...props}/>);
 
-        expect(screen.getAllByText('Animated images and emoji').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Animated images (GIFs)').length).toBeGreaterThan(0);
         expect(screen.getByRole('radio', {name: 'On'})).toBeChecked();
         expect(screen.getByRole('radio', {name: 'Off'})).not.toBeChecked();
     });

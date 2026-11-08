@@ -111,7 +111,7 @@ export type Props = WrappedComponentProps & {
 
     /*
     * When false, animated images (GIFs) show a still first frame until the user plays them.
-    * Comes from the "Animated images and emoji" display setting.
+    * Comes from the "Animated images (GIFs)" display setting.
     */
     allowAnimatedImages?: boolean;
 };
@@ -164,8 +164,8 @@ export class SizeAwareImage extends React.PureComponent<Props, State> {
             this.drawStillFrame();
         }
 
-        // A manual "play" only lasts while the setting is off and for the same image
-        if (this.state.playing && (this.props.allowAnimatedImages !== false || prevProps.src !== this.props.src)) {
+        // A manual "play" only lasts while the setting stays unchanged and for the same image
+        if (this.state.playing && (prevProps.allowAnimatedImages !== this.props.allowAnimatedImages || prevProps.src !== this.props.src)) {
             this.setState({playing: false});
         }
     }
@@ -342,6 +342,15 @@ export class SizeAwareImage extends React.PureComponent<Props, State> {
         // the <canvas> holding its first frame is what the user sees.
         const showingStill = this.isShowingStill();
 
+        // The canvas bitmap is sized to the GIF's natural size, so it needs the same sizing limits as the <img>
+        const canvasStyle: CSSProperties = {
+            maxWidth: '100%',
+            maxHeight: MAX_IMAGE_HEIGHT,
+            height: 'auto',
+            ...(Number(props.width) ? {width: Number(props.width)} : {}),
+            ...mergedImgStyle,
+        };
+
         const image = (
             <>
                 <img
@@ -366,14 +375,17 @@ export class SizeAwareImage extends React.PureComponent<Props, State> {
                         onClick={this.handleImageClick}
                         onKeyDown={this.onEnterKeyDown}
                         className={imageClassName}
-                        style={mergedImgStyle}
+                        style={canvasStyle}
                     />
                 )}
             </>
         );
 
         let animationToggle;
-        if (this.isStillMode() && this.state.loaded) {
+
+        // Small images skip the toggle (like the copy/download buttons); they play with a click or Enter on the frame
+        const isTooSmallForToggle = this.state.isSmallImage || this.state.imageWidth < MIN_IMAGE_SIZE_FOR_INTERNAL_BUTTONS;
+        if (this.isStillMode() && this.state.loaded && !isTooSmallForToggle) {
             const toggleLabel = showingStill ? intl.formatMessage({id: 'size_aware_image.play_animation', defaultMessage: 'Play animation'}) : intl.formatMessage({id: 'size_aware_image.pause_animation', defaultMessage: 'Pause animation'});
             animationToggle = (
                 <WithTooltip title={toggleLabel}>

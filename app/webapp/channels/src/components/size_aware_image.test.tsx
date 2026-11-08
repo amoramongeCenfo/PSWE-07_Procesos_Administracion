@@ -351,6 +351,18 @@ describe('components/SizeAwareImage', () => {
             expect(screen.getByRole('button', {name: 'Play animation'})).toBeInTheDocument();
         });
 
+        test('should hide the play button on small GIFs but still play on click', async () => {
+            const {container} = renderWithContext(<SizeAwareImage {...gifProps}/>, preferencesState('false'));
+
+            await simulateImageLoad(container.querySelector('img[aria-label]') as HTMLImageElement, 80, 80);
+
+            expect(container.querySelector('.size-aware-image__animation-toggle')).toBeNull();
+
+            await userEvent.click(container.querySelector('canvas') as HTMLCanvasElement);
+
+            expect(container.querySelector('canvas')).toBeNull();
+        });
+
         test('should not make a non-animated image static when the setting is off', async () => {
             const {container} = renderWithContext(
                 <SizeAwareImage {...{...baseProps, src: 'https://example.com/image.png', fileInfo: undefined}}/>,
