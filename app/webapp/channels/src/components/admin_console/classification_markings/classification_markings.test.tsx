@@ -653,10 +653,8 @@ describe('ClassificationMarkings component', () => {
         const user = userEvent.setup();
         const colorInput = screen.getByTestId('color-inputColorValue');
 
-        await act(async () => {
-            await user.clear(colorInput);
-            await user.type(colorInput, '#1a2b3c');
-        });
+        await user.clear(colorInput);
+        await user.type(colorInput, '#1a2b3c');
 
         expect(colorInput).toHaveValue('#1a2b3c');
     });
