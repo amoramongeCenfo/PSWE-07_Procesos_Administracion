@@ -4,7 +4,7 @@
 
 Proyecto final del curso **C3-PSWE Procesos de Ingeniería de Software** (Universidad CENFOTEC).
 
-**Mejora propuesta:** opción de cuenta para desactivar la animación de GIFs y emoji en Mattermost (accesibilidad, WCAG 2.2.2).
+**Mejora propuesta:** opción de cuenta para desactivar la animación de GIFs en Mattermost (accesibilidad, WCAG 2.2.2).
 **Issue base:** [mattermost/mattermost#17740](https://github.com/mattermost/mattermost/issues/17740)
 
 ## Código base

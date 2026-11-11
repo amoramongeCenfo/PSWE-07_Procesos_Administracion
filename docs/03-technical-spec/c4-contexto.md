@@ -18,7 +18,7 @@ flowchart LR
     usuario["<b>Usuario final</b><br/>[Persona]<br/><br/>Miembro de equipo; puede ser<br/>sensible a contenido animado"]
     admin["<b>Administrador del sistema</b><br/>[Persona]<br/><br/>Configura y opera la<br/>instancia auto-hospedada"]
 
-    mm["<b>Mattermost</b><br/>[Sistema de software]<br/><br/>Plataforma de colaboración auto-hospedada<br/>Servidor Go + webapp React/TypeScript<br/><br/><i>Mejora: preferencia de usuario para<br/>desactivar animación de GIF y emoji</i>"]
+    mm["<b>Mattermost</b><br/>[Sistema de software]<br/><br/>Plataforma de colaboración auto-hospedada<br/>Servidor Go + webapp React/TypeScript<br/><br/><i>Mejora: preferencia de usuario para<br/>desactivar la animación de GIFs</i>"]
 
     giphy["<b>Giphy</b><br/>[Sistema externo]<br/><br/>Proveedor de GIFs<br/>del selector de GIF"]
     web["<b>Sitios web externos</b><br/>[Sistema externo]<br/><br/>Imágenes/GIF enlazados<br/>y vistas previas de enlaces"]
@@ -51,7 +51,7 @@ flowchart LR
 |---|---|---|---|
 | Usuario final | Persona | Miembro de equipo que usa canales, DMs e hilos | Activa/desactiva la preferencia de animación |
 | Administrador | Persona | Opera la instancia (System Console, mmctl) | Sin cambios en el alcance |
-| Mattermost | Sistema | Servidor Go + webapp React/TS; PostgreSQL y almacenamiento de archivos son internos (nivel 2) | Recibe la nueva preferencia y el render estático de GIF/emoji |
+| Mattermost | Sistema | Servidor Go + webapp React/TS; PostgreSQL y almacenamiento de archivos son internos (nivel 2) | Recibe la nueva preferencia y el render estático de GIF |
 | Giphy | Externo | Proveedor del selector de GIF | Sus GIFs se mostrarán estáticos si la preferencia está desactivada |
 | Sitios web externos | Externo | Imágenes/GIF enlazados y previews | Igual que Giphy |
 | SMTP / Push / IdP / Integraciones | Externos | Correo, push, autenticación, webhooks | Sin impacto |

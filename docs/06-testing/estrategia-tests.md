@@ -5,8 +5,8 @@
 
 ## 1. Objetivo
 
-Asegurar que el ajuste **"Permitir imágenes y emojis animados"** (#17740) funciona en todos los puntos donde
-Mattermost renderiza GIFs y emojis, **sin romper el comportamiento actual** (ajuste activado por defecto), y producir
+Asegurar que el ajuste **«Animated images (GIFs)»** (#17740) funciona en todos los puntos donde
+Mattermost renderiza GIFs, **sin romper el comportamiento actual** (ajuste activado por defecto), y producir
 evidencia medible (cobertura, defectos) para el proceso.
 
 ## 2. Pirámide de pruebas
@@ -25,7 +25,7 @@ flowchart TB
 | Nivel | Herramienta | Qué cubre | Dónde viven | Cuándo corren |
 |---|---|---|---|---|
 | Unitarias | Jest | Selector de la preferencia (`get(state, category, name, default)`), helpers que deciden si animar, valor por defecto `true` | Junto al archivo: `foo.ts` → `foo.test.ts` (convención Mattermost) | Local + cada PR |
-| Componentes | Jest + React Testing Library (`renderWithContext`) | Toggle en *Configuración > Pantalla*; `SizeAwareImage`, `SingleImageView`, `MarkdownImage`, `PostEmoji`, `Reaction`, vista ampliada: render estático vs. animado, clic/tap reproduce, botón de pausa, auto-ocultar (timers falsos) | Co-ubicadas en `app/webapp/channels/src/components/...` | Local + cada PR |
+| Componentes | Jest + React Testing Library (`renderWithContext`) | Toggle en *Configuración > Pantalla*; `SizeAwareImage`, `SingleImageView`, `MarkdownImage`, vista ampliada: render estático vs. animado, clic/tap reproduce, botón de pausa, auto-ocultar (timers falsos) | Co-ubicadas en `app/webapp/channels/src/components/...` | Local + cada PR |
 | e2e | Playwright (`app/e2e-tests/playwright`, ya trae specs de `accessibility/`) | 2–3 escenarios de punta a punta sobre servidor real | `app/e2e-tests/playwright/specs/functional/...` | Manual antes de Code Freeze (#28) y para la demo |
 | Manual / exploratoria | Mattermost local + checklist | Escritorio (hover) vs. móvil (tap), hilos, vista ampliada | Evidencia en el PR (captura/GIF) | Antes de pedir revisión |
 
@@ -44,7 +44,7 @@ equipo de 3, por eso se limitan a los escenarios de la demo y se corren manualme
 | C4 | Ajuste desactivado → GIF muestra primer cuadro (estático) | mismos archivos, caso nuevo | Componente |
 | C5 | Clic/tap sobre GIF estático lo reproduce; aparece botón de pausa | mismos archivos + `user-event` | Componente |
 | C6 | Botón de pausa se oculta tras N s de inactividad | `jest.useFakeTimers()` + `advanceTimersByTime` | Componente |
-| C7 | Emojis animados (mensaje y reacciones) estáticos con ajuste desactivado | `post_emoji.test.tsx`, `reaction.test.tsx` | Componente |
+| C7 | ~~Emojis animados estáticos~~ — fuera de alcance (la mejora se limita a GIFs) | — | — |
 | C8 | Vista ampliada respeta estado pausado | `file_preview_modal.test.tsx`, `image_preview.test.tsx` | Componente |
 | C9 | Flujo completo usuario: desactivar → ver canal con GIF → estático → clic → anima | spec Playwright nueva | e2e |
 

@@ -1,5 +1,5 @@
 name: "Funcionalidad / mejora"
-description: "Trabajo de desarrollo sobre la mejora (#17740: control de animaciones de GIFs y emojis)."
+description: "Trabajo de desarrollo sobre la mejora (#17740: control de animaciones de GIFs)."
 title: "[feat] "
 labels: ["enhancement"]
 body:
