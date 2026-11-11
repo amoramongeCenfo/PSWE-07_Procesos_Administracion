@@ -390,6 +390,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
         />
       </div>
       <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
         <section
           class="section-max form-horizontal "
         >
@@ -1051,6 +1090,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
           >
             <h4
               class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
               id="channel_display_modeTitle"
             >
               Channel Display
@@ -1635,6 +1713,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
             class="section-min__describe"
             id="click_to_replyDesc"
           />
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
         </div>
         <div
           class="divider-dark"
@@ -2249,6 +2366,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
           >
             <h4
               class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
               id="channel_display_modeTitle"
             >
               Channel Display
@@ -2795,6 +2951,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
           >
             <h4
               class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
               id="channel_display_modeTitle"
             >
               Channel Display
@@ -3258,6 +3453,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
             class="section-min__describe"
             id="click_to_replyDesc"
           />
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
         </div>
         <div
           class="divider-dark"
@@ -3857,6 +4091,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
             class="section-min__describe"
             id="click_to_replyDesc"
           />
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
         </div>
         <div
           class="divider-dark"
@@ -4483,6 +4756,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
           >
             <h4
               class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
               id="channel_display_modeTitle"
             >
               Channel Display
@@ -5014,6 +5326,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
             class="section-min__describe"
             id="click_to_replyDesc"
           />
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
         </div>
         <div
           class="divider-dark"
@@ -5575,6 +5926,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
           >
             <h4
               class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
               id="channel_display_modeTitle"
             >
               Channel Display
@@ -6106,6 +6496,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
             class="section-min__describe"
             id="click_to_replyDesc"
           />
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
         </div>
         <div
           class="divider-dark"
@@ -6675,6 +7104,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
           >
             <h4
               class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
               id="channel_display_modeTitle"
             >
               Channel Display
@@ -7221,6 +7689,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should match snaps
           >
             <h4
               class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
               id="channel_display_modeTitle"
             >
               Channel Display
@@ -7713,6 +8220,45 @@ exports[`components/user_settings/display/UserSettingsDisplay should not show la
             class="section-min__describe"
             id="click_to_replyDesc"
           />
+        </div>
+        <div
+          class="divider-dark"
+        />
+      </div>
+      <div>
+        <div
+          class="section-min"
+          data-testid="section-min"
+        >
+          <div
+            class="section-min__header"
+          >
+            <h4
+              class="section-min__title"
+              id="allow_animated_imagesTitle"
+            >
+              Animated images (GIFs)
+            </h4>
+            <button
+              aria-expanded="false"
+              aria-labelledby="allow_animated_imagesTitle allow_animated_imagesEdit"
+              class="color--link style--none section-min__edit"
+              id="allow_animated_imagesEdit"
+            >
+              <i
+                aria-hidden="true"
+                class="icon-pencil-outline"
+                title="Edit Icon"
+              />
+              Edit
+            </button>
+          </div>
+          <div
+            class="section-min__describe"
+            id="allow_animated_imagesDesc"
+          >
+            On
+          </div>
         </div>
         <div
           class="divider-dark"

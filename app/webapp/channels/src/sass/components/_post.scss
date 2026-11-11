@@ -1543,6 +1543,33 @@
             color: rgba(var(--center-channel-color-rgb), 0.75);
         }
     }
+    // play/pause control for animated images when "Animated images (GIFs)" is off
+    .size-aware-image__animation-toggle {
+        position: absolute;
+        z-index: 3;
+        top: 8px;
+        left: 8px;
+        display: inline-flex;
+        width: 32px;
+        height: 32px;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: 1px solid rgba(var(--center-channel-color-rgb), 0.16);
+        border-radius: 50%;
+        background-color: var(--center-channel-bg);
+        box-shadow: variables.$elevation-1;
+        color: rgba(var(--center-channel-color-rgb), 0.75);
+
+        svg {
+            fill: rgba(var(--center-channel-color-rgb), 0.75);
+        }
+
+        &:hover {
+            background-color: rgba(var(--center-channel-color-rgb), 0.08);
+        }
+    }
+
     // styles for image container of large images.
     .image-loaded-container {
         position: relative;

@@ -47,6 +47,7 @@ function getDisplayStateFromProps(props: Props) {
         lastActiveDisplay: props.lastActiveDisplay.toString(),
         oneClickReactionsOnPosts: props.oneClickReactionsOnPosts,
         clickToReply: props.clickToReply,
+        allowAnimatedImages: props.allowAnimatedImages,
     };
 }
 
@@ -113,6 +114,7 @@ type Props = OwnProps & {
     collapsedReplyThreads: string;
     collapsedReplyThreadsAllowUserPreference: boolean;
     clickToReply: string;
+    allowAnimatedImages: string;
     linkPreviewDisplay: string;
     oneClickReactionsOnPosts: string;
     emojiPickerEnabled: boolean;
@@ -143,6 +145,7 @@ type State = {
     lastActiveDisplay: string;
     oneClickReactionsOnPosts: string;
     clickToReply: string;
+    allowAnimatedImages: string;
     handleSubmit?: () => void;
     serverError?: string;
 };
@@ -289,6 +292,12 @@ export default class UserSettingsDisplay extends React.PureComponent<Props, Stat
             name: Preferences.CLICK_TO_REPLY,
             value: this.state.clickToReply,
         };
+        const allowAnimatedImagesPreference = {
+            user_id: userId,
+            category: Preferences.CATEGORY_DISPLAY_SETTINGS,
+            name: Preferences.ALLOW_ANIMATED_IMAGES,
+            value: this.state.allowAnimatedImages,
+        };
 
         this.setState({isSaving: true});
 
@@ -298,6 +307,7 @@ export default class UserSettingsDisplay extends React.PureComponent<Props, Stat
             messageDisplayPreference,
             collapsedReplyThreadsPreference,
             clickToReplyPreference,
+            allowAnimatedImagesPreference,
             collapseDisplayPreference,
             linkPreviewDisplayPreference,
             teammateNameDisplayPreference,
@@ -353,6 +363,10 @@ export default class UserSettingsDisplay extends React.PureComponent<Props, Stat
 
     handleClickToReplyRadio = (clickToReply: string) => {
         this.setState({clickToReply});
+    };
+
+    handleAllowAnimatedImagesRadio = (allowAnimatedImages: string) => {
+        this.setState({allowAnimatedImages});
     };
 
     handleOnChange(e: React.ChangeEvent, display: {[key: string]: any}) {
@@ -1014,6 +1028,39 @@ export default class UserSettingsDisplay extends React.PureComponent<Props, Stat
             }),
         });
 
+        const allowAnimatedImagesSection = this.createSection({
+            section: Preferences.ALLOW_ANIMATED_IMAGES,
+            display: 'allowAnimatedImages',
+            value: this.state.allowAnimatedImages,
+            defaultDisplay: Preferences.ALLOW_ANIMATED_IMAGES_DEFAULT,
+            title: defineMessage({
+                id: 'user.settings.display.allowAnimatedImages',
+                defaultMessage: 'Animated images (GIFs)',
+            }),
+            firstOption: {
+                value: 'true',
+                radionButtonText: {
+                    label: defineMessage({
+                        id: 'user.settings.sidebar.on',
+                        defaultMessage: 'On',
+                    }),
+                },
+            },
+            secondOption: {
+                value: 'false',
+                radionButtonText: {
+                    label: defineMessage({
+                        id: 'user.settings.sidebar.off',
+                        defaultMessage: 'Off',
+                    }),
+                },
+            },
+            description: defineMessage({
+                id: 'user.settings.display.allowAnimatedImagesDescription',
+                defaultMessage: 'When off, GIFs are shown as a still image until you select them.',
+            }),
+        });
+
         const channelDisplayModeSection = this.createSection({
             section: Preferences.CHANNEL_DISPLAY_MODE,
             display: 'channelDisplayMode',
@@ -1210,6 +1257,7 @@ export default class UserSettingsDisplay extends React.PureComponent<Props, Stat
                     {collapseSection}
                     {messageDisplaySection}
                     {clickToReply}
+                    {allowAnimatedImagesSection}
                     {channelDisplayModeSection}
                     {oneClickReactionsOnPostsSection}
                     {renderEmoticonsAsEmojiSection}
