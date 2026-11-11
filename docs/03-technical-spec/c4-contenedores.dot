@@ -1,0 +1,57 @@
+// C4 Nivel 2 — Contenedores: Mattermost v11.11.1 + mejora issue #17740
+// Fuente as code (Graphviz). Render:
+//   dot -Tpng -Gdpi=200 c4-contenedores.dot -o c4-contenedores.png
+//   dot -Tsvg c4-contenedores.dot -o c4-contenedores.svg
+// Contenedor con borde naranja = modificado por la mejora. Flechas naranjas = flujo de la preferencia.
+
+digraph C4_Contenedores {
+    graph [
+        label=<<b><font point-size="20">C4 Nivel 2 — Contenedores: Mattermost v11.11.1 + mejora issue #17740</font></b><br/><font point-size="12">Contenedor resaltado en naranja = modificado por la mejora</font>>,
+        labelloc=t, fontname="Arial", rankdir=TB, nodesep=0.5, ranksep=0.7, bgcolor="white", pad=0.3
+    ];
+    node  [fontname="Arial", fontsize=11, fontcolor="white", style="rounded,filled", shape=box, margin="0.2,0.1"];
+    edge  [fontname="Arial", fontsize=10, color="#555555", fontcolor="#333333", arrowsize=0.8];
+
+    // Personas
+    usuario [label=<<b>Usuario final</b><br/>[Persona]<br/>Puede ser sensible a contenido animado>, fillcolor="#08427B", color="#073B6F"];
+    admin   [label=<<b>Administrador</b><br/>[Persona]<br/>Opera la instancia>, fillcolor="#08427B", color="#073B6F"];
+
+    subgraph cluster_mm {
+        label=<<b>Mattermost</b>&nbsp;[Sistema de software, auto-hospedado]>;
+        labeljust=l; style="dashed,rounded"; color="#444444"; fontcolor="#222222"; fontsize=12;
+
+        desktop [label=<<b>App de escritorio</b><br/>[Contenedor: Electron]<br/>Envuelve la webapp:<br/>hereda el cambio sin código propio>, fillcolor="#438DD5", color="#2E6295"];
+        movil   [label=<<b>App móvil</b><br/>[Contenedor: React Native]<br/><i>Fuera de alcance</i>>, fillcolor="#C9D9EA", color="#5A7FA8", fontcolor="#1F2D3D", style="rounded,filled,dashed"];
+        webapp  [label=<<b>Webapp</b><br/>[Contenedor: React · TypeScript · Redux]<br/>SPA en el navegador<br/><i>MODIFICADO: ajuste «Animated images (GIFs)»<br/>en Configuración &gt; Pantalla; GIF estático,<br/>reproducir con clic/Enter y botón play/pausa</i>>, fillcolor="#438DD5", color="#F5A623", penwidth=4];
+
+        server  [label=<<b>Servidor de aplicación</b><br/>[Contenedor: Go]<br/>REST API v4 + WebSocket + proxy de imágenes<br/><i>Sin cambios: reutiliza la API de preferencias</i>>, fillcolor="#438DD5", color="#2E6295"];
+
+        db      [label=<<b>Base de datos</b><br/>[Contenedor: PostgreSQL]<br/>Tabla Preferences (UserId, Category, Name, Value)<br/><i>Nueva preferencia display_settings /<br/>allow_animated_images (default true)</i>>, shape=cylinder, style=filled, fillcolor="#438DD5", color="#2E6295"];
+        files   [label=<<b>Almacenamiento de archivos</b><br/>[Contenedor: disco local / S3]<br/>GIFs e imágenes subidos>, shape=cylinder, style=filled, fillcolor="#438DD5", color="#2E6295"];
+    }
+
+    // Sistemas externos
+    giphy [label=<<b>Giphy</b><br/>[Sistema externo]<br/>Selector de GIFs>, fillcolor="#999999", color="#6B6B6B"];
+    web   [label=<<b>Sitios web externos</b><br/>[Sistema externo]<br/>Imágenes y GIF enlazados>, fillcolor="#999999", color="#6B6B6B"];
+    otros [label=<<b>SMTP · Push Proxy · IdP · Integraciones</b><br/>[Sistemas externos, sin cambios]>, fillcolor="#999999", color="#6B6B6B"];
+
+    // Relaciones
+    usuario -> desktop [label="Usa", style=dashed];
+    usuario -> movil   [label="Usa", style=dashed];
+    usuario -> webapp  [label="Chatea y activa/desactiva\nla animación [HTTPS]", color="#F5A623", penwidth=2];
+    admin   -> webapp  [label="System Console [HTTPS]"];
+
+    movil  -> server [label="REST/WebSocket"];
+    webapp -> server [label="Guarda/lee preferencia\nPUT·GET /api/v4/users/{id}/preferences\n[JSON/HTTPS] · eventos [WebSocket]", color="#F5A623", penwidth=2];
+    webapp -> giphy  [label="Busca GIFs [HTTPS]"];
+
+    server -> db    [label="Lee/escribe\npreferencias [SQL]", color="#F5A623", penwidth=2];
+    server -> files [label="Lee/escribe archivos"];
+    server -> web   [label="Obtiene imágenes\n(proxy) [HTTPS]"];
+    server -> otros [label="Correo, push,\nauth, webhooks"];
+
+    { rank=same; usuario; admin; }
+    // Externos a la derecha del sistema, al nivel del servidor/almacenamiento
+    webapp -> giphy [style=invis];
+    files -> web [style=invis, constraint=false];
+}

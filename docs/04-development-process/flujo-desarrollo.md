@@ -4,7 +4,7 @@
 > Complementos: [Estrategia de pruebas](../06-testing/estrategia-tests.md) · [CI con GitHub Actions](../07-deployment-and-monitoring/ci-github-actions.md)
 
 El equipo (3 integrantes) trabaja sobre un snapshot de Mattermost v11.11.1 en `app/`. La mejora (#17740, control de
-animaciones de GIFs y emojis) es el vehículo; este documento describe **el proceso** que se aplica y se mide.
+animaciones de GIFs) es el vehículo; este documento describe **el proceso** que se aplica y se mide.
 
 ## 1. Vista general
 
@@ -34,8 +34,8 @@ y de medición (lead time).
 | **Tablero** | [GitHub Projects #2](https://github.com/users/amoramongeCenfo/projects/2). Estados: `Todo` → `In Progress` → `Done`. Un issue pasa a `In Progress` cuando se crea su rama. |
 | **Plantillas** | `.github/ISSUE_TEMPLATE/`: `feature.yml` (funcionalidad, con criterios de aceptación y pruebas previstas), `bug.yml` (defecto, con origen de detección), `tarea.yml` (proceso/documentación, con definición de hecho). |
 | **Responsable** | Un solo *assignee* por issue. Si dos personas colaboran, se divide en sub-issues. |
-| **Etiquetas** | Tipo: `enhancement`, `bug`, `documentation`, `accessibility`. Área (propuestas): `ci`, `tests`, `process`. |
-| **Hitos** | Un *milestone* por entrega: `Avance 2`, `Entrega final`, `Defensa`. Permite ver avance por fecha. |
+| **Etiquetas** | Se propone usar etiquetas por tipo (`enhancement`, `bug`, `documentation`, `accessibility`) y por área (`ci`, `tests`, `process`). |
+| **Hitos** | Se propone un *milestone* por entrega (`Avance 2`, `Entrega final`, `Defensa`) para ver el avance por fecha. |
 | **Tamaño** | Un issue debe poder cerrarse en ≤ 3 días de trabajo. Si no, se parte. |
 | **Cierre** | Automático al hacer merge del PR que contiene `Closes #n`. Issues sin código (p. ej. PDF) se cierran a mano con enlace a la evidencia. |
 
@@ -79,7 +79,7 @@ Se adopta **GitHub Flow** (variante liviana de *trunk-based development*):
    (toggle desactivado no cambia comportamiento) o se divide el issue.
 2. Antes de abrir el PR: `git fetch origin && git rebase origin/main` (historial lineal, conflictos se resuelven en la rama).
 3. **Commits** con [Conventional Commits](https://www.conventionalcommits.org/es/v1.0.0/):
-   `feat(display): agregar toggle de animaciones`, `test(emoji): ...`, `ci: ...`, `docs: ...`.
+   `feat(display): agregar toggle de animaciones`, `test(images): ...`, `ci: ...`, `docs: ...`.
 4. **Merge**: *squash merge* → un commit por issue en `main`, mensaje = título del PR + `(#PR)`.
 5. Rama se borra al hacer merge.
 
