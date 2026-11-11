@@ -174,20 +174,30 @@ export class SizeAwareImage extends React.PureComponent<Props, State> {
         this.mounted = false;
     }
 
-    isAnimatedImage = () => {
-        if (isGIFImage(this.props.fileInfo?.extension ?? '')) {
+    isAnimatedImage = (props: Props = this.props) => {
+        const {dimensions, fileInfo, src} = props;
+
+        // The server's metadata is the most reliable signal: it also covers proxied and extension-less URLs
+        if (isGIFImage(fileInfo?.extension ?? '') || dimensions?.format === 'gif' || (dimensions?.frameCount ?? 0) > 1) {
             return true;
         }
 
         try {
-            return new URL(this.props.src, 'http://localhost').pathname.toLowerCase().endsWith('.gif');
+            const url = new URL(src, 'http://localhost');
+            if (url.pathname.toLowerCase().endsWith('.gif')) {
+                return true;
+            }
+
+            // Image proxy URLs (/api/v4/image?url=<original>) carry the original address in the query
+            const original = url.searchParams.get('url');
+            return Boolean(original) && new URL(original!, 'http://localhost').pathname.toLowerCase().endsWith('.gif');
         } catch {
             return false;
         }
     };
 
     // True when the user turned animations off and this image is an animated one
-    isStillMode = (props: Props = this.props) => props.allowAnimatedImages === false && this.isAnimatedImage();
+    isStillMode = (props: Props = this.props) => props.allowAnimatedImages === false && this.isAnimatedImage(props);
 
     isShowingStill = () => this.isStillMode() && !this.state.playing && this.state.loaded;
 
