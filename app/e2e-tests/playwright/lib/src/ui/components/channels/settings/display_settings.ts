@@ -15,6 +15,7 @@ export type DisplaySettingsSection =
     | 'collapseImagePreviews'
     | 'messageDisplay'
     | 'clickToReply'
+    | 'animatedImages'
     | 'channelDisplayMode'
     | 'oneClickReactions'
     | 'emojiPicker'
@@ -31,6 +32,7 @@ const sectionTitles: Record<DisplaySettingsSection, string> = {
     collapseImagePreviews: 'Default Appearance of Image Previews',
     messageDisplay: 'Message Display',
     clickToReply: 'Click to open threads',
+    animatedImages: 'Animated images (GIFs)',
     channelDisplayMode: 'Channel Display',
     oneClickReactions: 'Quick reactions on messages',
     emojiPicker: 'Render emoticons as emojis',
@@ -55,6 +57,7 @@ export default class DisplaySettings {
     readonly collapseImagePreviewsEditButton;
     readonly messageDisplayEditButton;
     readonly clickToReplyEditButton;
+    readonly animatedImagesEditButton;
     readonly channelDisplayModeEditButton;
     readonly oneClickReactionsEditButton;
     readonly emojiPickerEditButton;
@@ -77,6 +80,7 @@ export default class DisplaySettings {
         this.collapseImagePreviewsEditButton = container.locator('#collapseEdit');
         this.messageDisplayEditButton = container.locator('#message_displayEdit');
         this.clickToReplyEditButton = container.locator('#click_to_replyEdit');
+        this.animatedImagesEditButton = container.locator('#allow_animated_imagesEdit');
         this.channelDisplayModeEditButton = container.locator('#channel_display_modeEdit');
         this.oneClickReactionsEditButton = container.locator('#one_click_reactions_enabledEdit');
         this.emojiPickerEditButton = container.locator('#renderEmoticonsAsEmojiEdit');
@@ -105,5 +109,14 @@ export default class DisplaySettings {
         await this.verifySectionIsExpanded('theme');
         await this.container.getByRole('button', {name: theme}).click();
         await this.container.getByRole('button', {name: 'Save', exact: true}).click();
+    }
+
+    // #17740: "Animated images (GIFs)" setting
+    async setAnimatedImages(value: 'On' | 'Off') {
+        await this.animatedImagesEditButton.click();
+        await this.verifySectionIsExpanded('animatedImages');
+        await this.container.getByRole('radio', {name: value}).check();
+        await this.container.getByRole('button', {name: 'Save', exact: true}).click();
+        await expect(this.animatedImagesEditButton).toBeVisible();
     }
 }

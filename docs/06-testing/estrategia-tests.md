@@ -1,7 +1,8 @@
 # Estrategia de pruebas
 
 > Entregable 2 — sección (a). Issue del tablero: #13 "Issues, ramificación y estrategia de tests".
-> Relacionado: [Flujo de desarrollo](../04-development-process/flujo-desarrollo.md) · [CI](../07-deployment-and-monitoring/ci-github-actions.md) · issue #26 (pruebas Jest/e2e y cobertura)
+> Actualizado en la entrega final con el issue #26 (pruebas Jest/e2e y cobertura): matriz con el estado real, e2e C9 y línea base sin emojis.
+> Relacionado: [Flujo de desarrollo](../04-development-process/flujo-desarrollo.md) · [CI](../07-deployment-and-monitoring/ci-github-actions.md)
 
 ## 1. Objetivo
 
@@ -25,8 +26,8 @@ flowchart TB
 | Nivel | Herramienta | Qué cubre | Dónde viven | Cuándo corren |
 |---|---|---|---|---|
 | Unitarias | Jest | Selector de la preferencia (`get(state, category, name, default)`), helpers que deciden si animar, valor por defecto `true` | Junto al archivo: `foo.ts` → `foo.test.ts` (convención Mattermost) | Local + cada PR |
-| Componentes | Jest + React Testing Library (`renderWithContext`) | Toggle en *Configuración > Pantalla*; `SizeAwareImage`, `SingleImageView`, `MarkdownImage`, vista ampliada: render estático vs. animado, clic/tap reproduce, botón de pausa, auto-ocultar (timers falsos) | Co-ubicadas en `app/webapp/channels/src/components/...` | Local + cada PR |
-| e2e | Playwright (`app/e2e-tests/playwright`, ya trae specs de `accessibility/`) | 2–3 escenarios de punta a punta sobre servidor real | `app/e2e-tests/playwright/specs/functional/...` | Manual antes de Code Freeze (#28) y para la demo |
+| Componentes | Jest + React Testing Library (`renderWithContext`) | Toggle en *Configuración > Pantalla*; `SizeAwareImage`, `SingleImageView`, `MarkdownImage`, vista ampliada: render estático vs. animado, clic/tap/Enter reproduce, botón de pausa | Co-ubicadas en `app/webapp/channels/src/components/...` | Local + cada PR |
+| e2e | Playwright (`app/e2e-tests/playwright`, ya trae specs de `accessibility/`) | 3 escenarios de punta a punta sobre servidor real (C9), incluido uno en pantalla de teléfono | `app/e2e-tests/playwright/specs/functional/channels/animated_images/` | Manual antes de Code Freeze (#28) y para la demo |
 | Manual / exploratoria | Mattermost local + checklist | Escritorio (hover) vs. móvil (tap), hilos, vista ampliada | Evidencia en el PR (captura/GIF) | Antes de pedir revisión |
 
 **Por qué este reparto.** El 95 % del cambio es frontend React; Mattermost ya tiene una infraestructura Jest/RTL madura
@@ -36,19 +37,31 @@ equipo de 3, por eso se limitan a los escenarios de la demo y se corren manualme
 
 ## 3. Matriz criterio → prueba
 
-| # | Criterio de aceptación (#17740) | Prueba | Nivel |
-|---|---|---|---|
-| C1 | Existe el toggle en Configuración > Pantalla, activado por defecto | `user_settings_display.test.tsx` | Componente |
-| C2 | Cambiar el toggle guarda la preferencia del usuario (API de preferencias) | `user_settings_display.test.tsx` (mock de `savePreferences`) | Componente |
-| C3 | Ajuste activado → GIF se reproduce igual que hoy (regresión) | `size_aware_image.test.tsx`, `single_image_view.test.tsx`, `markdown_image.test.tsx` | Componente |
-| C4 | Ajuste desactivado → GIF muestra primer cuadro (estático) | mismos archivos, caso nuevo | Componente |
-| C5 | Clic/tap sobre GIF estático lo reproduce; aparece botón de pausa | mismos archivos + `user-event` | Componente |
-| C6 | Botón de pausa se oculta tras N s de inactividad | `jest.useFakeTimers()` + `advanceTimersByTime` | Componente |
-| C7 | ~~Emojis animados estáticos~~ — fuera de alcance (la mejora se limita a GIFs) | — | — |
-| C8 | Vista ampliada respeta estado pausado | `file_preview_modal.test.tsx`, `image_preview.test.tsx` | Componente |
-| C9 | Flujo completo usuario: desactivar → ver canal con GIF → estático → clic → anima | spec Playwright nueva | e2e |
+| # | Criterio de aceptación (#17740) | Prueba | Nivel | Estado |
+|---|---|---|---|---|
+| C1 | Existe el toggle en Configuración > Pantalla, activado por defecto | `user_settings_display.test.tsx` (sección visible con su valor); `user_settings/display/index.test.ts` (sin preferencia guardada vale `true`, respeta `false`, modo admin) | Componente / unitaria | ✔ Cubierto |
+| C2 | Cambiar el toggle guarda la preferencia del usuario (API de preferencias) | `user_settings_display.test.tsx` (mock de `savePreferences`); e2e C9 (recarga la página y la preferencia persiste) | Componente + e2e | ✔ Cubierto |
+| C3 | Ajuste activado → GIF se reproduce igual que hoy (regresión) | `size_aware_image.test.tsx` (también sin preferencia guardada), `single_image_view.test.tsx`, `markdown_image.test.tsx` | Componente | ✔ Cubierto |
+| C4 | Ajuste desactivado → GIF muestra primer cuadro (estático) | mismos archivos (adjunto, GIF por proxy/metadata, GIF en Markdown); una imagen no animada no cambia | Componente | ✔ Cubierto |
+| C5 | Clic/tap sobre GIF estático lo reproduce; aparece botón de pausa | mismos archivos + `user-event`: clic, **tap táctil** (`pointer` con `TouchA`), **Enter** (teclado), pausa vuelve a estático, otro GIF empieza estático | Componente | ✔ Cubierto |
+| C6 | ~~Botón de pausa se oculta tras N s de inactividad~~ | — | — | Propuesto **fuera de alcance**: no se implementó; el botón visible siempre es más accesible (en móvil no hay *hover* para hacerlo reaparecer). Mejora futura |
+| C7 | ~~Emojis animados estáticos~~ — fuera de alcance (la mejora se limita a GIFs) | — | — | Fuera de alcance |
+| C8 | Vista ampliada respeta estado pausado | `file_preview_modal.test.tsx`, `image_preview.test.tsx` + paso en la e2e | Componente + e2e | ⏳ Pendiente de #24; si no entra antes del Code Freeze (#28), pasa a fuera de alcance |
+| C9 | Flujo completo usuario: desactivar → ver canal con GIF → estático → clic → anima | `specs/functional/channels/animated_images/animated_images_setting.spec.ts` (3 escenarios: flujo completo + persistencia, clic sobre GIF en reproducción abre la vista ampliada, pantalla de teléfono 390×844) | e2e | ✔ Escrita; se corre manualmente con servidor local (setup opción B) |
 
-La matriz se actualiza cuando los issues #16 y #24 identifican nuevos puntos de renderizado.
+**Verificación de las pruebas (regla 5).** Se hizo prueba de mutación manual: con el valor por defecto cambiado a
+`false` y con el componente ignorando la preferencia, fallan 12 pruebas nuevas; las que siguen pasando son los casos
+de regresión con el ajuste activado, que deben pasar igual.
+
+**Efecto en pruebas existentes.** El ajuste nuevo se ubica entre «Click to open threads» y «Channel Display», lo que
+cambia el orden de tabulación de *Configuración > Pantalla*. Se actualizó la spec de accesibilidad
+`specs/accessibility/channels/settings_dialog/display.spec.ts` y el *page object* `display_settings.ts`
+(botón `#allow_animated_imagesEdit`, método `setAnimatedImages`).
+
+**Datos de prueba.** `app/e2e-tests/playwright/asset/animated-240x160.gif` (GIF animado de 10 cuadros, 21 KB;
+≥ 100 px de ancho para que se muestre el botón de reproducir/pausar).
+
+La matriz se actualiza cuando el issue #24 identifique nuevos puntos de renderizado.
 
 ## 4. Suite de la mejora (`tests/jest.config.feature.js`)
 
@@ -66,6 +79,18 @@ npx jest --config ../../../tests/jest.config.feature.js --coverage
 
 Para agregar un componente a la suite: añadir su ruta en `FEATURE_PATHS` dentro del archivo.
 
+Rutas actuales: `user_settings/display`, `size_aware_image`, `single_image_view`, `markdown_image` y
+`file_preview_modal`. Los componentes de emojis (`post_emoji`, `emoji`, reacciones) se quitaron al dejar los
+emojis fuera de alcance (#26).
+
+**e2e (C9)** — con el servidor local levantado (ver setup local, opción B):
+
+```bash
+cd app/e2e-tests/playwright
+npm ci && npx playwright install chromium
+npx playwright test specs/functional/channels/animated_images specs/accessibility/channels/settings_dialog/display.spec.ts --project=chrome
+```
+
 ## 5. Reglas del equipo
 
 1. **Prueba primero el criterio**: cada criterio de aceptación del issue tiene al menos una prueba antes de pedir revisión.
@@ -82,14 +107,33 @@ Para agregar un componente a la suite: añadir su ruta en `FEATURE_PATHS` dentro
 
 | Métrica | Cómo se obtiene | Valor aceptable (propuesto) |
 |---|---|---|
-| Cobertura de líneas de módulos afectados | Resumen del job `jest` en CI (`coverage-summary.json`, artefacto por ejecución) | Línea base medida antes del primer cambio; meta final **≥ línea base y ≥ 80 % en archivos nuevos** |
+| Cobertura de líneas de módulos afectados | Resumen del job `jest` en CI (`coverage-summary.json`, artefacto por ejecución) | Línea base medida antes del primer cambio; meta final **≥ línea base y ≥ 80 % del código nuevo** (la mejora no creó archivos nuevos, por eso se mide sobre las líneas que agregó) |
 | Defectos escapados | Issues `bug` con origen "Después de integrar a main" | ≤ 1 por entrega |
 | Defectos en revisión | Comentarios de revisión por PR (plantilla de PR) | Tendencia a la baja entre E2 y final |
 
-**Línea base** (suite de la mejora sobre `main` sin cambios, v11.11.1, ejecución local 2026-11-06):
+**Cobertura de la suite de la mejora** (misma configuración en ambas filas, ejecución local 2026-11-24):
 
-| Suites | Pruebas | Snapshots | Tiempo | Statements | Branches | Functions | Lines |
-|---|---|---|---|---|---|---|---|
-| 24 | 197 ✔ | 68 | ~21 s | 71.49 % (1041/1456) | 62.54 % (576/921) | 64.59 % (166/257) | **71.70 % (1034/1442)** |
+| Medición | Suites | Pruebas | Statements | Branches | Functions | Lines |
+|---|---|---|---|---|---|---|
+| **Línea base** — `main` antes de la mejora (`06cab8d7`, previo al PR #39) | 18 | 153 ✔ | 79.78 % (908/1138) | 68.83 % (508/738) | 72.19 % (148/205) | **80.10 % (902/1126)** |
+| **Final** — mejora (PR #39) + pruebas del #26 | 19 | 177 ✔ | 80.85 % (967/1196) | 71.35 % (573/803) | 73.48 % (158/215) | **81.11 % (958/1181)** |
+| Diferencia | +1 | +24 | +1.07 pp | +2.52 pp | +1.29 pp | **+1.01 pp** |
 
-Confirmar con la primera ejecución en CI y registrar en el documento de métricas (#20, #27).
+Por archivo modificado por la mejora:
+
+| Archivo | Líneas base | Líneas final | Código nuevo cubierto (por diferencia) |
+|---|---|---|---|
+| `size_aware_image.tsx` | 92.62 % (113/122) | 94.79 % (164/173) | 51/51 líneas (100 %) |
+| `user_settings_display.tsx` | 76.77 % (119/155) | 76.72 % (122/159) | 3/4 líneas (75 %) |
+| `single_image_view.tsx` (solo pruebas) | 84.21 % | 86.84 % | — |
+| `markdown_image.tsx` (solo pruebas) | 91.52 % | 91.52 % | — |
+
+Resultado frente a la meta: **≥ línea base ✔** (81.11 % vs. 80.10 %); **≥ 80 % del código nuevo ✔** (54/55 líneas
+nuevas cubiertas, 98 %).
+
+> La línea base anterior (71.70 %, 197 pruebas, 2026-11-06) incluía los componentes de emojis. Al quedar fuera de
+> alcance se quitaron de la suite y la línea base se volvió a medir con la configuración nueva sobre el commit previo a
+> la mejora, para que ambas cifras sean comparables. La línea base se midió en un *worktree* de git del commit
+> `06cab8d7` con la configuración actual de `tests/jest.config.feature.js`.
+
+Registrar en el documento de métricas (#20, #27).

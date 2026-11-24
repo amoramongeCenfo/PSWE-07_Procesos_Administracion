@@ -463,5 +463,81 @@ describe('components/SizeAwareImage', () => {
 
             expect(onClick).toHaveBeenCalledTimes(1);
         });
+
+        // #26 — C1/C3: with no saved preference the default is "on", so GIFs keep animating as before
+        test('should animate a GIF when the user never saved the preference (default on)', async () => {
+            const noPreferenceState = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    preferences: {myPreferences: {}},
+                },
+            };
+            const {container} = renderWithContext(<SizeAwareImage {...gifProps}/>, noPreferenceState);
+
+            await simulateImageLoad(screen.getByRole('img', {hidden: true}) as HTMLImageElement, 300, 200);
+
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(container.querySelector('.size-aware-image__animation-toggle')).toBeNull();
+        });
+
+        // #26 — C5 on touch devices: a tap on the still frame plays the GIF and does not open the preview
+        test('tapping a still GIF on a touch screen plays it and shows the pause button', async () => {
+            const onClick = jest.fn();
+            const user = userEvent.setup();
+            const {container} = renderWithContext(<SizeAwareImage {...{...gifProps, onClick}}/>, preferencesState('false'));
+
+            await simulateImageLoad(container.querySelector('img[aria-label]') as HTMLImageElement, 300, 200);
+
+            const stillFrame = screen.getByRole('img', {name: /Animation paused, select to play/});
+            await user.pointer({keys: '[TouchA]', target: stillFrame});
+
+            expect(onClick).not.toHaveBeenCalled();
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(screen.getByRole('button', {name: 'Pause animation'})).toBeInTheDocument();
+        });
+
+        // #26 — C5 by keyboard (WCAG 2.1.1): Enter on the still frame plays it; Enter on the playing GIF opens the preview
+        test('pressing Enter on a still GIF plays it, and Enter again opens the preview', async () => {
+            const onClick = jest.fn();
+            const {container} = renderWithContext(<SizeAwareImage {...{...gifProps, onClick}}/>, preferencesState('false'));
+
+            await simulateImageLoad(container.querySelector('img[aria-label]') as HTMLImageElement, 300, 200);
+
+            const stillFrame = screen.getByRole('img', {name: /Animation paused, select to play/});
+            expect(stillFrame).toHaveAttribute('tabindex', '0');
+
+            stillFrame.focus();
+            await userEvent.keyboard('{Enter}');
+
+            expect(onClick).not.toHaveBeenCalled();
+            expect(container.querySelector('canvas')).toBeNull();
+
+            const playingImage = container.querySelector('img[aria-label]') as HTMLImageElement;
+            expect(playingImage).toHaveAttribute('tabindex', '0');
+            playingImage.focus();
+            await userEvent.keyboard('{Enter}');
+
+            expect(onClick).toHaveBeenCalledTimes(1);
+        });
+
+        // #26 — a manual "play" only applies to the GIF the user chose; a new image starts still again
+        test('should go back to the still frame when the image source changes', async () => {
+            const {container, rerender} = renderWithContext(<SizeAwareImage {...gifProps}/>, preferencesState('false'));
+
+            await simulateImageLoad(container.querySelector('img[aria-label]') as HTMLImageElement, 300, 200);
+            await userEvent.click(screen.getByRole('button', {name: 'Play animation'}));
+            expect(container.querySelector('canvas')).toBeNull();
+
+            rerender(
+                <SizeAwareImage
+                    {...gifProps}
+                    src='https://example.com/other.gif'
+                />,
+            );
+
+            expect(container.querySelector('canvas')).not.toBeNull();
+            expect(screen.getByRole('button', {name: 'Play animation'})).toBeInTheDocument();
+        });
     });
 });
