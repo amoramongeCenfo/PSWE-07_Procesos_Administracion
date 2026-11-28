@@ -39,6 +39,7 @@ const KeyCodes = Constants.KeyCodes;
 
 export type Props = {
     canDownloadFiles: boolean;
+    allowAnimatedImages?: boolean;
     enablePublicLink: boolean;
 
     /**
@@ -592,6 +593,7 @@ export default class FilePreviewModal extends React.PureComponent<Props, State> 
                         <ImagePreview
                             fileInfo={fileInfo as FileInfo}
                             canDownloadFiles={this.props.canDownloadFiles}
+                            allowAnimatedImages={this.props.allowAnimatedImages}
                             scale={currentScale}
                             translate={currentTranslate}
                             onWheel={this.handleImageWheel}

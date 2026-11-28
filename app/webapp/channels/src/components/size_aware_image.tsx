@@ -10,7 +10,7 @@ import {FormattedMessage, injectIntl} from 'react-intl';
 import type {WrappedComponentProps} from 'react-intl';
 import {connect} from 'react-redux';
 
-import {DownloadOutlineIcon, LinkVariantIcon, CheckIcon, PlayIcon} from '@mattermost/compass-icons/components';
+import {DownloadOutlineIcon, LinkVariantIcon, CheckIcon} from '@mattermost/compass-icons/components';
 import {WithTooltip} from '@mattermost/shared/components/tooltip';
 import type {FileInfo} from '@mattermost/types/files';
 import type {PostImage} from '@mattermost/types/posts';
@@ -19,6 +19,7 @@ import {getBool} from 'mattermost-redux/selectors/entities/preferences';
 import type {ActionResult} from 'mattermost-redux/types/actions';
 import {getFileMiniPreviewUrl} from 'mattermost-redux/utils/file_utils';
 
+import AnimatedImageToggle from 'components/animated_image_toggle/animated_image_toggle';
 import LoadingImagePreview from 'components/loading_image_preview';
 
 import {FileTypes, Preferences} from 'utils/constants';
@@ -396,31 +397,11 @@ export class SizeAwareImage extends React.PureComponent<Props, State> {
         // Small images skip the toggle (like the copy/download buttons); they play with a click or Enter on the frame
         const isTooSmallForToggle = this.state.isSmallImage || this.state.imageWidth < MIN_IMAGE_SIZE_FOR_INTERNAL_BUTTONS;
         if (this.isStillMode() && this.state.loaded && !isTooSmallForToggle) {
-            const toggleLabel = showingStill ? intl.formatMessage({id: 'size_aware_image.play_animation', defaultMessage: 'Play animation'}) : intl.formatMessage({id: 'size_aware_image.pause_animation', defaultMessage: 'Pause animation'});
             animationToggle = (
-                <WithTooltip title={toggleLabel}>
-                    <button
-                        className='style--none size-aware-image__animation-toggle'
-                        aria-label={toggleLabel}
-                        onClick={showingStill ? this.playAnimation : this.pauseAnimation}
-                    >
-                        {showingStill ? (
-                            <PlayIcon
-                                className={'style--none'}
-                                size={18}
-                            />
-                        ) : (
-                            <svg
-                                width='18'
-                                height='18'
-                                viewBox='0 0 24 24'
-                                aria-hidden='true'
-                            >
-                                <path d='M6 5h4v14H6zM14 5h4v14h-4z'/>
-                            </svg>
-                        )}
-                    </button>
-                </WithTooltip>
+                <AnimatedImageToggle
+                    playing={!showingStill}
+                    onToggle={showingStill ? this.playAnimation : this.pauseAnimation}
+                />
             );
         }
 

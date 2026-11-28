@@ -6,7 +6,7 @@ import React from 'react';
 
 import ImagePreview from 'components/file_preview_modal/image_preview';
 
-import {render, screen} from 'tests/react_testing_utils';
+import {act, render, renderWithContext, screen, userEvent} from 'tests/react_testing_utils';
 import {TestHelper} from 'utils/test_helper';
 
 describe('components/view_image/ImagePreview', () => {
@@ -124,5 +124,151 @@ describe('components/view_image/ImagePreview', () => {
 
         expect(screen.getByRole('link')).toHaveAttribute('href', '#');
         expect(screen.getByTestId('imagePreview')).toHaveAttribute('src', props.fileInfo.link);
+    });
+
+    describe('animated images (GIFs)', () => {
+        const gifProps = {
+            ...baseProps,
+            fileInfo: {
+                ...fileInfo1,
+                id: 'gif_id',
+                extension: 'gif',
+                has_preview_image: true,
+            },
+            allowAnimatedImages: false,
+        };
+
+        function loadImage(img: HTMLElement) {
+            Object.defineProperty(img, 'naturalWidth', {value: 300, configurable: true});
+            Object.defineProperty(img, 'naturalHeight', {value: 200, configurable: true});
+            return act(() => {
+                img.dispatchEvent(new Event('load', {bubbles: true}));
+            });
+        }
+
+        beforeEach(() => {
+            jest.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({drawImage: jest.fn()} as unknown as CanvasRenderingContext2D);
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        test('should open a GIF paused (still frame) when animated images are turned off', async () => {
+            const {container} = renderWithContext(<ImagePreview {...gifProps}/>);
+
+            await loadImage(screen.getByTestId('imagePreview'));
+
+            expect(container.querySelector('canvas')).not.toBeNull();
+            expect(screen.getByTestId('imagePreview')).toHaveStyle({display: 'none'});
+            expect(screen.getByRole('button', {name: 'Play animation'})).toBeInTheDocument();
+        });
+
+        test('should never show the animated image while paused, even before it finishes loading', () => {
+            renderWithContext(<ImagePreview {...gifProps}/>);
+
+            expect(screen.getByTestId('imagePreview')).toHaveStyle({display: 'none'});
+        });
+
+        test('should keep animating a GIF when animated images are turned on', async () => {
+            const {container} = renderWithContext(
+                <ImagePreview
+                    {...gifProps}
+                    allowAnimatedImages={true}
+                />,
+            );
+
+            await loadImage(screen.getByTestId('imagePreview'));
+
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(screen.getByTestId('imagePreview')).not.toHaveStyle({display: 'none'});
+            expect(screen.queryByRole('button', {name: 'Play animation'})).not.toBeInTheDocument();
+        });
+
+        test('should default to animating when the setting is not provided', async () => {
+            const {allowAnimatedImages, ...propsWithoutSetting} = gifProps;
+            expect(allowAnimatedImages).toBe(false);
+            const {container} = renderWithContext(<ImagePreview {...propsWithoutSetting}/>);
+
+            await loadImage(screen.getByTestId('imagePreview'));
+
+            expect(container.querySelector('canvas')).toBeNull();
+        });
+
+        test('should not make a non-GIF image static when animated images are turned off', async () => {
+            const {container} = renderWithContext(
+                <ImagePreview
+                    {...gifProps}
+                    fileInfo={{...gifProps.fileInfo, extension: 'png'}}
+                />,
+            );
+
+            await loadImage(screen.getByTestId('imagePreview'));
+
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(screen.getByTestId('imagePreview')).not.toHaveStyle({display: 'none'});
+            expect(screen.queryByRole('button', {name: 'Play animation'})).not.toBeInTheDocument();
+        });
+
+        test('should play with the button and pause again', async () => {
+            const {container} = renderWithContext(<ImagePreview {...gifProps}/>);
+            await loadImage(screen.getByTestId('imagePreview'));
+
+            await userEvent.click(screen.getByRole('button', {name: 'Play animation'}));
+
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(screen.getByTestId('imagePreview')).not.toHaveStyle({display: 'none'});
+
+            await userEvent.click(screen.getByRole('button', {name: 'Pause animation'}));
+
+            expect(container.querySelector('canvas')).not.toBeNull();
+        });
+
+        test('should play when the still frame is clicked', async () => {
+            const {container} = renderWithContext(<ImagePreview {...gifProps}/>);
+            await loadImage(screen.getByTestId('imagePreview'));
+
+            await userEvent.click(container.querySelector('canvas') as HTMLCanvasElement);
+
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(screen.getByRole('button', {name: 'Pause animation'})).toBeInTheDocument();
+        });
+
+        test('should keep playing when the animated image is clicked', async () => {
+            const {container} = renderWithContext(<ImagePreview {...gifProps}/>);
+            await loadImage(screen.getByTestId('imagePreview'));
+            await userEvent.click(screen.getByRole('button', {name: 'Play animation'}));
+
+            await userEvent.click(screen.getByTestId('imagePreview'));
+
+            expect(container.querySelector('canvas')).toBeNull();
+        });
+
+        test('should apply zoom and pan to the still frame too', async () => {
+            const {container} = renderWithContext(
+                <ImagePreview
+                    {...gifProps}
+                    scale={2}
+                    translate={{x: 10, y: 5}}
+                    isZoomed={true}
+                />,
+            );
+            await loadImage(screen.getByTestId('imagePreview'));
+
+            expect(container.querySelector('canvas')).toHaveStyle({transform: 'translate(10px, 5px) scale(2)'});
+        });
+
+        test('should also pause GIFs when the user cannot download files', async () => {
+            const {container} = renderWithContext(
+                <ImagePreview
+                    {...gifProps}
+                    canDownloadFiles={false}
+                />,
+            );
+
+            await loadImage(container.querySelector('img') as HTMLElement);
+
+            expect(container.querySelector('canvas')).not.toBeNull();
+        });
     });
 });

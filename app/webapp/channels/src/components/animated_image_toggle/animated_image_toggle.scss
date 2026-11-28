@@ -1,0 +1,46 @@
+@use 'utils/variables';
+
+// Play/pause button centered over an animated image. The parent must be `position: relative`.
+.animated-image-toggle {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(var(--center-channel-color-rgb), 0.16);
+    border-radius: 50%;
+    background-color: var(--center-channel-bg);
+    box-shadow: variables.$elevation-1;
+    color: rgba(var(--center-channel-color-rgb), 0.75);
+    opacity: 1;
+    transform: translate(-50%, -50%);
+    transition: opacity 150ms ease-in-out;
+
+    svg {
+        fill: rgba(var(--center-channel-color-rgb), 0.75);
+    }
+
+    &:hover {
+        background-color: rgba(var(--center-channel-color-rgb), 0.08);
+    }
+
+    // Auto-hidden after 5s: still in the DOM, revealed again by hovering the image or focusing the button
+    &--hidden {
+        opacity: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
+}
+
+.image-loaded-container:hover .animated-image-toggle--hidden,
+.image_preview__animated:hover .animated-image-toggle--hidden,
+.animated-image-toggle--hidden:focus-visible {
+    opacity: 1;
+}

@@ -8,11 +8,13 @@ import type {Post} from '@mattermost/types/posts';
 
 import {getConfig} from 'mattermost-redux/selectors/entities/general';
 import {getPost} from 'mattermost-redux/selectors/entities/posts';
+import {getBool} from 'mattermost-redux/selectors/entities/preferences';
 
 import {getIsMobileView} from 'selectors/views/browser';
 
 import {makeAsyncComponent} from 'components/async_load';
 
+import {Preferences} from 'utils/constants';
 import {canDownloadFiles} from 'utils/file_utils';
 
 import type {GlobalState} from 'types/store';
@@ -30,6 +32,7 @@ function mapStateToProps(state: GlobalState, ownProps: OwnProps) {
     const config = getConfig(state);
 
     return {
+        allowAnimatedImages: getBool(state, Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.ALLOW_ANIMATED_IMAGES, true),
         canDownloadFiles: canDownloadFiles(config),
         enablePublicLink: config.EnablePublicLink === 'true',
         isMobileView: getIsMobileView(state),
