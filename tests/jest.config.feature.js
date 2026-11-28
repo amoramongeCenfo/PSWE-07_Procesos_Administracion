@@ -1,4 +1,4 @@
-// Suite Jest de la mejora #17740 (control de animaciones de GIFs y emojis).
+// Suite Jest de la mejora #17740 (control de animación de GIFs).
 //
 // Reutiliza la configuración oficial del webapp de Mattermost y la acota a los
 // componentes que la mejora toca. Sirve para dos cosas:
@@ -8,8 +8,9 @@
 // Uso (desde app/webapp/channels):
 //   npx jest --config ../../../tests/jest.config.feature.js --coverage
 //
-// Al encontrar un nuevo punto de renderizado de GIF/emoji (issues #16 y #24),
-// agregar su ruta en FEATURE_PATHS.
+// Los emojis animados quedaron fuera de alcance (#26), por eso sus componentes
+// no están en la suite. Al encontrar un nuevo punto de renderizado de GIF
+// (p. ej. issue #24), agregar su ruta en FEATURE_PATHS.
 
 const path = require('path');
 
@@ -18,16 +19,12 @@ const baseConfig = require(path.join(channelsDir, 'jest.config.js'));
 
 // Rutas relativas a app/webapp/channels/src
 const FEATURE_PATHS = [
-    'components/user_settings/display', // toggle "Permitir imágenes y emojis animados"
+    'components/user_settings/display', // ajuste "Animated images (GIFs)"
     'components/size_aware_image', // imágenes / GIFs en mensajes
     'components/single_image_view', // adjunto de imagen único
     'components/markdown_image', // imágenes embebidas en markdown (GIPHY)
-    'components/file_preview_modal', // vista ampliada
-    'components/post_emoji', // emojis en el cuerpo del mensaje
-    'components/emoji', // emojis personalizados
-    'components/post_view/reaction', // reacciones
-    'components/post_view/post_reaction', // menú rápido de reacciones
-    'components/post_view/post_recent_reactions',
+    'components/file_preview_modal', // vista ampliada (GIF en pausa, #42)
+    'components/animated_image_toggle', // botón play/pausa compartido (#42)
 ];
 
 // Las pruebas nuevas del equipo se escriben co-ubicadas junto al componente

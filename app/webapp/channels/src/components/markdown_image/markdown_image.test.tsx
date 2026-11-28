@@ -363,4 +363,82 @@ describe('components/MarkdownImage', () => {
         );
         expect(screen.getByText(props.alt)).toBeInTheDocument();
     });
+
+    // #26 — "Animated images (GIFs)" setting (#17740) on GIFs embedded with Markdown (e.g. GIPHY links)
+    describe('animated images setting', () => {
+        const gifProps = {
+            ...baseProps,
+            alt: 'funny gif',
+            src: 'https://media.example.com/media/abc123/giphy.gif',
+            imageMetadata: {
+                format: 'gif',
+                frameCount: 12,
+                width: 300,
+                height: 90,
+            },
+            actions: {
+                openModal: jest.fn(),
+            },
+        };
+
+        const preferencesState = (value: string) => ({
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        'display_settings--allow_animated_images': {
+                            user_id: 'current_user_id',
+                            category: 'display_settings',
+                            name: 'allow_animated_images',
+                            value,
+                        },
+                    },
+                },
+            },
+        });
+
+        function renderLoadedGif(value: string) {
+            const utils = renderWithContext(<MarkdownImage {...gifProps}/>, preferencesState(value));
+
+            const img = utils.container.querySelector('img[aria-label]') as HTMLImageElement;
+            Object.defineProperty(img, 'naturalHeight', {value: 90, configurable: true});
+            Object.defineProperty(img, 'naturalWidth', {value: 300, configurable: true});
+
+            // fireEvent used because userEvent doesn't support image loading events
+            fireEvent.load(img);
+
+            return utils;
+        }
+
+        beforeEach(() => {
+            gifProps.actions.openModal.mockClear();
+            jest.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({drawImage: jest.fn()} as unknown as CanvasRenderingContext2D);
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        test('C3: setting on, the embedded GIF animates and a click opens the preview as before', async () => {
+            const {container} = renderLoadedGif('true');
+
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(screen.queryByRole('button', {name: 'Play animation'})).not.toBeInTheDocument();
+
+            await userEvent.click(container.querySelector('img[aria-label]') as HTMLImageElement);
+            expect(gifProps.actions.openModal).toHaveBeenCalledTimes(1);
+        });
+
+        test('C4/C5: setting off, the embedded GIF shows a still frame; a click plays it without opening the preview', async () => {
+            const {container} = renderLoadedGif('false');
+
+            expect(container.querySelector('canvas')).not.toBeNull();
+            expect(screen.getByRole('button', {name: 'Play animation'})).toBeInTheDocument();
+
+            await userEvent.click(screen.getByRole('img', {name: /Animation paused, select to play/}));
+
+            expect(gifProps.actions.openModal).not.toHaveBeenCalled();
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(screen.getByRole('button', {name: 'Pause animation'})).toBeInTheDocument();
+        });
+    });
 });

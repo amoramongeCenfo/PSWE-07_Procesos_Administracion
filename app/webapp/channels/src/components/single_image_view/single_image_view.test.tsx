@@ -304,4 +304,103 @@ describe('components/SingleImageView', () => {
             expect(container).toMatchSnapshot();
         });
     });
+
+    // #26 — "Animated images (GIFs)" setting (#17740) on a single GIF attachment
+    describe('animated images setting', () => {
+        const gifProps = {
+            ...baseProps,
+            fileInfo: TestHelper.getFileInfoMock({
+                id: 'gif_file_info_id',
+                name: 'funny.gif',
+                extension: 'gif',
+                mime_type: 'image/gif',
+                has_preview_image: false,
+                width: 300,
+                height: 200,
+            }),
+            actions: {
+                ...baseProps.actions,
+                openModal: jest.fn(),
+            },
+        };
+
+        const preferencesState = (value: string) => ({
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        'display_settings--allow_animated_images': {
+                            user_id: 'current_user_id',
+                            category: 'display_settings',
+                            name: 'allow_animated_images',
+                            value,
+                        },
+                    },
+                },
+            },
+        });
+
+        async function renderLoadedGif(value: string) {
+            const utils = renderWithContext(<SingleImageView {...gifProps}/>, preferencesState(value));
+
+            await waitFor(() => {
+                expect(utils.container.querySelector('img[aria-label]')).toBeInTheDocument();
+            });
+
+            const img = utils.container.querySelector('img[aria-label]') as HTMLImageElement;
+            Object.defineProperty(img, 'naturalHeight', {value: 200, configurable: true});
+            Object.defineProperty(img, 'naturalWidth', {value: 300, configurable: true});
+
+            // fireEvent used because userEvent doesn't support image loading events
+            fireEvent.load(img);
+
+            return utils;
+        }
+
+        beforeEach(() => {
+            gifProps.actions.openModal.mockClear();
+            jest.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({drawImage: jest.fn()} as unknown as CanvasRenderingContext2D);
+        });
+
+        test('C3: setting on, the GIF animates and a click opens the preview as before', async () => {
+            const {container} = await renderLoadedGif('true');
+
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(screen.queryByRole('button', {name: 'Play animation'})).not.toBeInTheDocument();
+
+            await userEvent.click(container.querySelector('img[aria-label]') as HTMLImageElement);
+            expect(gifProps.actions.openModal).toHaveBeenCalledTimes(1);
+        });
+
+        test('C4/C5: setting off, the GIF shows a still frame; the first click plays it and the next one opens the preview', async () => {
+            const {container} = await renderLoadedGif('false');
+
+            expect(container.querySelector('canvas')).not.toBeNull();
+            expect(screen.getByRole('button', {name: 'Play animation'})).toBeInTheDocument();
+
+            await userEvent.click(screen.getByRole('img', {name: /Animation paused, select to play/}));
+
+            expect(gifProps.actions.openModal).not.toHaveBeenCalled();
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(screen.getByRole('button', {name: 'Pause animation'})).toBeInTheDocument();
+
+            await userEvent.click(container.querySelector('img[aria-label]') as HTMLImageElement);
+            expect(gifProps.actions.openModal).toHaveBeenCalledTimes(1);
+        });
+
+        test('setting off does not change a regular (non-animated) image attachment', async () => {
+            const {container} = renderWithContext(<SingleImageView {...baseProps}/>, preferencesState('false'));
+
+            await waitFor(() => {
+                expect(container.querySelector('img[aria-label]')).toBeInTheDocument();
+            });
+
+            const img = container.querySelector('img[aria-label]') as HTMLImageElement;
+            Object.defineProperty(img, 'naturalHeight', {value: 200, configurable: true});
+            Object.defineProperty(img, 'naturalWidth', {value: 300, configurable: true});
+            fireEvent.load(img);
+
+            expect(container.querySelector('canvas')).toBeNull();
+            expect(screen.queryByRole('button', {name: 'Play animation'})).not.toBeInTheDocument();
+        });
+    });
 });

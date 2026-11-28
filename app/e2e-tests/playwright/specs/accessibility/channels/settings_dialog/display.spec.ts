@@ -81,6 +81,10 @@ test(
         await page.keyboard.press('Tab');
         await pw.toBeFocusedWithFocusVisible(displaySettings.clickToReplyEditButton);
 
+        // # Press Tab to move focus to Animated images (GIFs) button (#17740)
+        await page.keyboard.press('Tab');
+        await pw.toBeFocusedWithFocusVisible(displaySettings.animatedImagesEditButton);
+
         // # Press Tab to move focus to Channel Display button
         await page.keyboard.press('Tab');
         await pw.toBeFocusedWithFocusVisible(displaySettings.channelDisplayModeEditButton);
