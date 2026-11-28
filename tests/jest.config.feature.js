@@ -23,7 +23,8 @@ const FEATURE_PATHS = [
     'components/size_aware_image', // imágenes / GIFs en mensajes
     'components/single_image_view', // adjunto de imagen único
     'components/markdown_image', // imágenes embebidas en markdown (GIPHY)
-    'components/file_preview_modal', // vista ampliada
+    'components/file_preview_modal', // vista ampliada (GIF en pausa, #42)
+    'components/animated_image_toggle', // botón play/pausa compartido (#42)
 ];
 
 // Las pruebas nuevas del equipo se escriben co-ubicadas junto al componente

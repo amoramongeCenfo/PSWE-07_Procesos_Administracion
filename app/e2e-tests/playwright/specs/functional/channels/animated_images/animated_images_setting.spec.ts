@@ -8,6 +8,10 @@ import {expect, test} from '@mattermost/playwright-lib';
 const GIF_FILE = 'animated-240x160.gif';
 const STILL_FRAME_NAME = /Animation paused, select to play/;
 
+// The play/pause button sits centered over the image (#42), so a plain click() on the image would land on it.
+// The image itself is selected near its top-left corner.
+const IMAGE_CORNER = {position: {x: 10, y: 10}};
+
 /**
  * @objective Verify that turning off "Animated images (GIFs)" shows posted GIFs as a still frame that the user can play and pause
  */
@@ -44,7 +48,7 @@ test(
         await expect(post.container.getByRole('button', {name: 'Play animation'})).toBeVisible();
 
         // # Select the still frame
-        await stillFrame.click();
+        await stillFrame.click(IMAGE_CORNER);
 
         // * The GIF plays, a pause button appears and the preview modal does not open
         await expect(stillFrame).toHaveCount(0);
@@ -69,10 +73,10 @@ test(
 );
 
 /**
- * @objective Verify that with animated images off, a GIF that is playing still opens the preview when selected
+ * @objective Verify that with animated images off, a GIF that is playing still opens the preview when selected, and the preview opens it paused
  */
 test(
-    'C9 selecting a GIF that is already playing opens the preview as usual',
+    'C9 selecting a GIF that is already playing opens the preview as usual, and C8 the preview opens it paused',
     {tag: ['@animated_images', '@display_settings', '@file_attachments']},
     async ({pw}) => {
         // # Create a test user with "Animated images (GIFs)" already off
@@ -88,14 +92,26 @@ test(
         // # Post a GIF, then play it
         await channelsPage.postMessage(`Animated GIF ${pw.random.id()}`, [GIF_FILE]);
         const post = await channelsPage.getLastPost();
-        await post.container.getByRole('img', {name: STILL_FRAME_NAME}).click();
+        await post.container.getByRole('img', {name: STILL_FRAME_NAME}).click(IMAGE_CORNER);
         await expect(post.container.getByRole('button', {name: 'Pause animation'})).toBeVisible();
 
         // # Select the playing GIF
-        await post.container.getByRole('img', {name: /file thumbnail/i}).click();
+        await post.container.getByRole('img', {name: /file thumbnail/i}).click(IMAGE_CORNER);
 
         // * The preview modal opens
-        await expect(page.locator('.file-preview-modal')).toBeVisible();
+        const previewModal = page.locator('.file-preview-modal');
+        await expect(previewModal).toBeVisible();
+
+        // * C8: with animated images off, the enlarged view opens the GIF paused (still frame + play button)
+        await expect(previewModal.getByRole('img', {name: STILL_FRAME_NAME})).toBeVisible();
+        await expect(previewModal.getByRole('button', {name: 'Play animation'})).toBeVisible();
+
+        // # Play it from the enlarged view
+        await previewModal.getByRole('button', {name: 'Play animation'}).click();
+
+        // * The GIF plays in the enlarged view and offers to pause it
+        await expect(previewModal.getByRole('img', {name: STILL_FRAME_NAME})).toHaveCount(0);
+        await expect(previewModal.getByRole('button', {name: 'Pause animation'})).toBeVisible();
     },
 );
 
@@ -128,7 +144,7 @@ test(
         await expect(post.container.getByRole('button', {name: 'Play animation'})).toBeInViewport();
 
         // # Select the still frame
-        await stillFrame.click();
+        await stillFrame.click(IMAGE_CORNER);
 
         // * The GIF plays and the pause button is shown
         await expect(stillFrame).toHaveCount(0);
