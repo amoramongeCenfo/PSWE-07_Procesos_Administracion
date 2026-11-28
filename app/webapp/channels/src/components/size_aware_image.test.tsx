@@ -463,5 +463,60 @@ describe('components/SizeAwareImage', () => {
 
             expect(onClick).toHaveBeenCalledTimes(1);
         });
+
+        describe('play/pause button placement and auto-hide', () => {
+            beforeEach(() => {
+                jest.useFakeTimers();
+            });
+
+            afterEach(() => {
+                jest.useRealTimers();
+            });
+
+            test('should be centered over the image, away from the copy/download buttons', async () => {
+                const {container} = renderWithContext(<SizeAwareImage {...gifProps}/>, preferencesState('false'));
+
+                await simulateImageLoad(container.querySelector('img[aria-label]') as HTMLImageElement, 300, 200);
+
+                const toggle = screen.getByRole('button', {name: 'Play animation'});
+                expect(toggle).toHaveClass('animated-image-toggle');
+                expect(toggle.closest('.image-preview-utility-buttons-container')).toBeNull();
+            });
+
+            test('should hide after 5 seconds but keep the still frame clickable', async () => {
+                const onClick = jest.fn();
+                const {container} = renderWithContext(<SizeAwareImage {...{...gifProps, onClick}}/>, preferencesState('false'));
+                await simulateImageLoad(container.querySelector('img[aria-label]') as HTMLImageElement, 300, 200);
+                const toggle = screen.getByRole('button', {name: 'Play animation'});
+                expect(toggle).not.toHaveClass('animated-image-toggle--hidden');
+
+                act(() => {
+                    jest.advanceTimersByTime(5000);
+                });
+
+                expect(toggle).toHaveClass('animated-image-toggle--hidden');
+
+                // The frame itself still plays on click, without opening the preview
+                act(() => {
+                    (container.querySelector('canvas') as HTMLCanvasElement).click();
+                });
+                expect(container.querySelector('canvas')).toBeNull();
+                expect(onClick).not.toHaveBeenCalled();
+            });
+
+            test('should reappear when the image changes between playing and paused', async () => {
+                const {container} = renderWithContext(<SizeAwareImage {...gifProps}/>, preferencesState('false'));
+                await simulateImageLoad(container.querySelector('img[aria-label]') as HTMLImageElement, 300, 200);
+                act(() => {
+                    jest.advanceTimersByTime(5000);
+                });
+
+                act(() => {
+                    screen.getByRole('button', {name: 'Play animation'}).click();
+                });
+
+                expect(screen.getByRole('button', {name: 'Pause animation'})).not.toHaveClass('animated-image-toggle--hidden');
+            });
+        });
     });
 });
