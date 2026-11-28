@@ -65,7 +65,8 @@ de la esquina inferior izquierda (`selectImage`). La vista ampliada se busca por
 archivo), porque la clase `.file-preview-modal` aparece en dos elementos del modal.
 
 **Ejecución local (2026-11-28).** Las 3 e2e de `animated_images` y las 16 de la spec de accesibilidad
-`display.spec.ts` pasan contra el servidor local (22/22 contando el setup).
+`display.spec.ts` pasan contra el servidor local (22/22 contando el setup). Evidencia:
+[reporte de Playwright](evidencias/e2e-26-reporte.png) y [log de la corrida](evidencias/e2e-26-local.log).
 
 **Datos de prueba.** `app/e2e-tests/playwright/asset/animated-240x160.gif` (GIF animado de 10 cuadros, 21 KB;
 ≥ 100 px de ancho para que se muestre el botón de reproducir/pausar).

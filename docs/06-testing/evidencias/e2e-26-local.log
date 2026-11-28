@@ -1,0 +1,95 @@
+Playwright Test Config:
+  - Headless  = true
+  - SlowMo    = 0
+  - Workers   = 1
+Server License:
+  - IsLicensed      = false
+  - IsTrial         = undefined
+  - SkuName         = undefined
+  - SkuShortName    = undefined
+  - Cloud           = undefined
+  - Users           = undefined
+Build Info:
+  - BuildNumber                 = dev
+  - BuildDate                   = n/a
+  - Version                     = 11.11.1
+  - BuildHash                   = 60305efecf9445eec3b7cf05a33d95be1e66dc56
+  - BuildHashEnterprise         = none
+  - BuildEnterpriseReady        = false
+  - ServiceEnvironment          = dev
+Notable Server Config:
+  - ServiceSettings.EnableSecurityFixAlert  = false
+  - LogSettings.EnableDiagnostics           = false
+Feature Flags:
+  - AggregatePluginMetrics = false
+  - AppsEnabled = false
+  - AttributeValueMasking = true
+  - AutoTranslation = true
+  - BurnOnRead = true
+  - CJKSearch = true
+  - ChannelBookmarks = true
+  - ChannelPermissionPolicies = true
+  - ClassificationMarkings = true
+  - ClusterGracefulDrain = true
+  - ContentFlagging = true
+  - DiscoverableChannels = false
+  - EnableAIPluginBridge = false
+  - EnableAIRecaps = false
+  - EnableConcurrentReact = false
+  - EnableDocs = false
+  - EnableMFIPluginSignaturePublicKey = true
+  - EnableMattermostEntry = true
+  - EnableSharedChannelsDMs = false
+  - EnableShiftEscapeToMarkAllRead = false
+  - EnableSyncAllUsersForRemoteCluster = false
+  - GlobalAttributes = false
+  - IntegratedBoards = false
+  - ManagedChannelCategories = false
+  - MmBlocksEnabled = true
+  - MobileEphemeralMode = false
+  - MobileSSOCodeExchange = false
+  - MoveThreadsEnabled = false
+  - NormalizeLdapDNs = false
+  - NotificationMonitoring = true
+  - PermissionPolicies = true
+  - PolicySimulation = true
+  - PostAttributes = false
+  - PropertyFieldRank = true
+  - RecurringScheduledPosts = false
+  - SessionAttributes = false
+  - TeamMembershipAccessControl = true
+  - TestBoolFeature = false
+  - TestFeature = off
+  - WysiwygEditor = false
+Plugin Settings:
+  - Enable  = true
+  - EnableUploads  = false
+  - AutomaticPrepackagedPlugins  = true
+
+
+Running 22 tests using 1 worker
+
+  ✓   1 [setup] › specs/test_setup.ts:6:6 › ensure plugins are loaded (722ms)
+  ✓   2 [setup] › specs/test_setup.ts:11:6 › ensure server deployment (613ms)
+  ✓   3 [setup] › specs/test_setup.ts:16:6 › ensure ABAC is configured (799ms)
+  ✓   4 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:9:5 › navigate on keyboard tab between interactive elements @accessibility @settings @display_settings (17.4s)
+  ✓   5 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:109:5 › accessibility scan and aria-snapshot of Display settings panel @accessibility @settings @display_settings @snapshots (16.7s)
+  ✓   6 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:200:5 › accessibility scan and aria-snapshot of Theme section @accessibility @settings @display_settings @snapshots (16.7s)
+  ✓   7 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:268:5 › accessibility scan and aria-snapshot of Timezone section @accessibility @settings @display_settings @snapshots (15.1s)
+  ✓   8 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:324:5 › accessibility scan and aria-snapshot of Language section @accessibility @settings @display_settings @snapshots (20.1s)
+  ✓   9 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:389:5 › accessibility scan and aria-snapshot of Clock Display section @accessibility @settings @display_settings @snapshots (16.2s)
+  ✓  10 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:447:5 › accessibility scan and aria-snapshot of Teammate Name Display section @accessibility @settings @display_settings @snapshots (16.6s)
+  ✓  11 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:507:5 › accessibility scan and aria-snapshot of Message Display section @accessibility @settings @display_settings @snapshots (18.2s)
+  ✓  12 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:565:5 › accessibility scan and aria-snapshot of Channel Display section @accessibility @settings @display_settings @snapshots (16.7s)
+  ✓  13 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:623:5 › accessibility scan and aria-snapshot of Show online availability section @accessibility @settings @display_settings @snapshots (18.2s)
+  ✓  14 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:681:5 › accessibility scan and aria-snapshot of Share last active time section @accessibility @settings @display_settings @snapshots (17.5s)
+  ✓  15 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:739:5 › accessibility scan and aria-snapshot of Website Link Previews section @accessibility @settings @display_settings @snapshots (16.2s)
+  ✓  16 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:797:5 › accessibility scan and aria-snapshot of Default Appearance of Image Previews section @accessibility @settings @display_settings @snapshots (17.7s)
+  ✓  17 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:856:5 › accessibility scan and aria-snapshot of Click to open threads section @accessibility @settings @display_settings @snapshots (16.3s)
+  ✓  18 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:914:5 › accessibility scan and aria-snapshot of Quick reactions on messages section @accessibility @settings @display_settings @snapshots (17.0s)
+  ✓  19 [chrome] › specs/accessibility/channels/settings_dialog/display.spec.ts:972:5 › accessibility scan and aria-snapshot of Render emoticons as emojis section @accessibility @settings @display_settings @snapshots (16.5s)
+  ✓  20 [chrome] › specs/functional/channels/animated_images/animated_images_setting.spec.ts:27:5 › C9 turns off animated images, sees a still GIF, plays and pauses it, and the choice persists @animated_images @display_settings @file_attachments (31.1s)
+  ✓  21 [chrome] › specs/functional/channels/animated_images/animated_images_setting.spec.ts:87:5 › C9 selecting a GIF that is already playing opens the preview as usual, and C8 the preview opens it paused @animated_images @display_settings @file_attachments (18.7s)
+  ✓  22 [chrome] › specs/functional/channels/animated_images/animated_images_setting.spec.ts:130:5 › C9 on a phone-sized screen the still GIF and its play button are shown and selecting it plays the GIF @animated_images @display_settings @mobile_view (21.3s)
+
+  22 passed (5.9m)
