@@ -1,6 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import type {Locator} from '@playwright/test';
+
 import {expect, test} from '@mattermost/playwright-lib';
 
 // Issue #26 (C9 of mattermost/mattermost#17740): "Animated images (GIFs)" display setting, end to end.
@@ -9,8 +11,15 @@ const GIF_FILE = 'animated-240x160.gif';
 const STILL_FRAME_NAME = /Animation paused, select to play/;
 
 // The play/pause button sits centered over the image (#42), so a plain click() on the image would land on it.
-// The image itself is selected near its top-left corner.
-const IMAGE_CORNER = {position: {x: 10, y: 10}};
+// The top-left corner is not free either: on hover, Mattermost shows the collapse-image button there.
+// The image itself is selected near its bottom-left corner.
+async function selectImage(image: Locator) {
+    const box = await image.boundingBox();
+    if (!box) {
+        throw new Error('Image is not visible');
+    }
+    await image.click({position: {x: 10, y: box.height - 10}});
+}
 
 /**
  * @objective Verify that turning off "Animated images (GIFs)" shows posted GIFs as a still frame that the user can play and pause
@@ -48,7 +57,7 @@ test(
         await expect(post.container.getByRole('button', {name: 'Play animation'})).toBeVisible();
 
         // # Select the still frame
-        await stillFrame.click(IMAGE_CORNER);
+        await selectImage(stillFrame);
 
         // * The GIF plays, a pause button appears and the preview modal does not open
         await expect(stillFrame).toHaveCount(0);
@@ -92,14 +101,14 @@ test(
         // # Post a GIF, then play it
         await channelsPage.postMessage(`Animated GIF ${pw.random.id()}`, [GIF_FILE]);
         const post = await channelsPage.getLastPost();
-        await post.container.getByRole('img', {name: STILL_FRAME_NAME}).click(IMAGE_CORNER);
+        await selectImage(post.container.getByRole('img', {name: STILL_FRAME_NAME}));
         await expect(post.container.getByRole('button', {name: 'Pause animation'})).toBeVisible();
 
         // # Select the playing GIF
-        await post.container.getByRole('img', {name: /file thumbnail/i}).click(IMAGE_CORNER);
+        await selectImage(post.container.getByRole('img', {name: /file thumbnail/i}));
 
         // * The preview modal opens
-        const previewModal = page.locator('.file-preview-modal');
+        const previewModal = page.getByRole('dialog', {name: GIF_FILE});
         await expect(previewModal).toBeVisible();
 
         // * C8: with animated images off, the enlarged view opens the GIF paused (still frame + play button)
@@ -144,7 +153,7 @@ test(
         await expect(post.container.getByRole('button', {name: 'Play animation'})).toBeInViewport();
 
         // # Select the still frame
-        await stillFrame.click(IMAGE_CORNER);
+        await selectImage(stillFrame);
 
         // * The GIF plays and the pause button is shown
         await expect(stillFrame).toHaveCount(0);

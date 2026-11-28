@@ -59,8 +59,13 @@ cambia el orden de tabulación de *Configuración > Pantalla*. Se actualizó la 
 (botón `#allow_animated_imagesEdit`, método `setAnimatedImages`).
 
 **Clic en la imagen en la e2e.** Desde #42 el botón play/pausa va centrado sobre la imagen. Un `click()` de
-Playwright apunta al centro del elemento y caería sobre el botón, así que la spec selecciona la imagen cerca de la
-esquina superior izquierda (`IMAGE_CORNER`).
+Playwright apunta al centro del elemento y caería sobre el botón. La esquina superior izquierda tampoco sirve: al
+pasar el puntero, Mattermost muestra ahí el botón para colapsar la imagen. Por eso la spec selecciona la imagen cerca
+de la esquina inferior izquierda (`selectImage`). La vista ampliada se busca por su rol (`dialog` con el nombre del
+archivo), porque la clase `.file-preview-modal` aparece en dos elementos del modal.
+
+**Ejecución local (2026-11-28).** Las 3 e2e de `animated_images` y las 16 de la spec de accesibilidad
+`display.spec.ts` pasan contra el servidor local (22/22 contando el setup).
 
 **Datos de prueba.** `app/e2e-tests/playwright/asset/animated-240x160.gif` (GIF animado de 10 cuadros, 21 KB;
 ≥ 100 px de ancho para que se muestre el botón de reproducir/pausar).
