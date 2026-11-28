@@ -38,3 +38,11 @@
         transition: none;
     }
 }
+
+// Wraps the preview only for paused GIFs, so the play/pause button can be centered over the image
+.image_preview__animated {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
